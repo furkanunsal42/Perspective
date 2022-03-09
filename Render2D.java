@@ -14,7 +14,7 @@ import javafx.stage.Stage;
 
 public class Render2D extends Application {
     byte move_x = 0, move_y = 0;
-    int speed = 10;
+    int speed = 4;
     public static void main(String[] args){
         launch(args);
     }
@@ -171,7 +171,7 @@ class object{
 class player extends object{
 
     double center_x, center_y, radius;
-    Color color = Color.GREEN;
+    Color color = Color.DARKRED;
 
     public player(){}
 
@@ -211,18 +211,14 @@ class player extends object{
 
     @Override
     void display(GraphicsContext g, boolean fill, boolean stroke){
-        g.beginPath();
-        g.strokeOval(center_x-radius, center_y-radius, radius * 2, radius * 2);
-        g.closePath();
         if (fill) {
-            g.setLineWidth(0);
             g.setFill(this.color);
-            g.fill();
+            g.fillOval(center_x-radius, center_y-radius, radius * 2, radius * 2);
         }
         if (stroke) {
             g.setLineWidth(1);
             g.setStroke(Color.BLACK);
-            g.stroke();
+            g.strokeOval(center_x-radius, center_y-radius, radius * 2, radius * 2);
         }
     }
 }

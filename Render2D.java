@@ -16,15 +16,22 @@ public class Render2D extends Application {
     public void start(Stage primary_stage){
         Pane root = new Pane();
 
-        object shape = new object(new vertex[]{     new vertex(200, 100),
-                                                    new vertex(100, 400),
-                                                    new vertex(200, 500),
-                                                    new vertex(300, 460)});
 
-        object shape2 = new object(new vertex[]{    new vertex(100, 300),
-                                                    new vertex(400, 400),
-                                                    new vertex(300, 100),
-                                                    new vertex(400, 260)});
+
+        object shape = new object(new vertex[]{     new vertex(200, 100),
+                new vertex(100, 400),
+                new vertex(200, 500),
+                new vertex(300, 460)});
+
+        object shape2 = new object(new vertex[]{    new vertex(400, 400),
+                new vertex(100, 300),
+                new vertex(300, 100),
+                new vertex(400, 260)});
+
+        player p = new player();
+        p.radius = 50;
+        p.center_x = 300;
+        p.center_y = 300;
 
         System.out.println( shape.does_collide(shape2));
 
@@ -32,6 +39,7 @@ public class Render2D extends Application {
         GraphicsContext g = canvas.getGraphicsContext2D();
         shape.display(g);
         shape2.display(g);
+        p.display(g);
         root.getChildren().add(canvas);
         Scene scene = new Scene(root, 800, 600);
         primary_stage.setScene(scene);
@@ -64,7 +72,7 @@ class object{
         return ((Path)Shape.intersect(this.get_path(), obj.get_path())).getElements().size() > 0;
     }
 
-    ObservableList<PathElement> collision(object obj){
+    ObservableList<PathElement> get_collision(object obj){
         return ((Path)Shape.intersect(this.get_path(), obj.get_path())).getElements();
     }
 
@@ -85,6 +93,29 @@ class object{
         }
         g.closePath();
         g.setFill(Color.SILVER);
-        g.fill();
+        g.stroke();
+    }
+}
+
+class player extends object{
+    double center_x, center_y, radius;
+
+    @Override
+    Path get_path(){
+        Path path = new Path();
+        path.getElements().add(new MoveTo(vertices[0].x, vertices[0].y));
+        for(vertex v: vertices){
+            path.getElements().add(new LineTo(v.x, v.y));
+        }
+        path.getElements().add(new ClosePath());
+        return path;
+    }
+
+    @Override
+    void display(GraphicsContext g){
+        g.beginPath();
+        g.strokeOval(center_x-radius, center_y-radius, radius * 2, radius * 2);
+        g.closePath();
+        g.stroke();
     }
 }

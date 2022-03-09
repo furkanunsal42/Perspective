@@ -13,7 +13,7 @@ import javafx.stage.Stage;
 
 
 public class Render2D extends Application {
-    byte move_x = 0, move_y = 0;
+    boolean move_x = false, move_inverse_x = false, move_y = false, move_inverse_y = false;
     int speed = 4;
     public static void main(String[] args){
         launch(args);
@@ -60,16 +60,18 @@ public class Render2D extends Application {
         primary_stage.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
             System.out.println(event.getCode());
             switch (event.getCode()){
-                case W -> move_y = -1;
-                case S -> move_y = 1;
-                case A -> move_x = -1;
-                case D -> move_x = +1;
+                case W -> move_inverse_y = true;
+                case S -> move_y = true;
+                case A -> move_inverse_x = true;
+                case D -> move_x = true;
             }
         });
         primary_stage.addEventHandler(KeyEvent.KEY_RELEASED, event -> {
             switch (event.getCode()){
-                case W, S -> move_y = 0;
-                case A, D -> move_x = 0;
+                case W -> move_inverse_y = false;
+                case S -> move_y = false;
+                case A -> move_inverse_x = false;
+                case D -> move_x = false;
             }
         });
 
@@ -77,8 +79,14 @@ public class Render2D extends Application {
             @Override
             public void handle(long l) {
                 System.out.println(p.center_x);
-                p.center_x += move_x * speed;
-                p.center_y += move_y * speed;
+                if(move_x)
+                    p.center_x += speed;
+                if(move_inverse_x)
+                    p.center_x -= speed;
+                if(move_y)
+                    p.center_y += speed;
+                if(move_inverse_y)
+                    p.center_y -= speed;
             }
         };
         movement.start();

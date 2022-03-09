@@ -18,12 +18,14 @@ public class Render2D extends Application {
 
 
 
-        object shape = new object(new vertex[]{     new vertex(200, 100),
+        object shape = new object(new vertex[]{
+                new vertex(200, 100),
                 new vertex(100, 400),
                 new vertex(200, 500),
                 new vertex(300, 460)});
 
-        object shape2 = new object(new vertex[]{    new vertex(400, 400),
+        object shape2 = new object(new vertex[]{
+                new vertex(400, 400),
                 new vertex(100, 300),
                 new vertex(300, 100),
                 new vertex(400, 260)});
@@ -37,10 +39,10 @@ public class Render2D extends Application {
 
         Canvas canvas = new Canvas(800, 600);
         GraphicsContext g = canvas.getGraphicsContext2D();
-        shape.display(g);
-        shape2.display(g);
-        p.display(g);
         root.getChildren().add(canvas);
+        root.getChildren().add(shape.get_path(true));
+        root.getChildren().add(shape2.get_path(true));
+        root.getChildren().add(p.get_path(true));
         Scene scene = new Scene(root, 800, 600);
         primary_stage.setScene(scene);
         primary_stage.show();
@@ -59,7 +61,7 @@ class vertex{
 
 class object{
     vertex[] vertices;
-
+    Color color = Color.GREEN;
     public object(){}
 
     public object(vertex[] input_vertices){
@@ -86,6 +88,15 @@ class object{
         return path;
     }
 
+    Path get_path(boolean fill){
+        Path path = this.get_path();
+        if (fill)
+            path.setFill(this.color);
+        else
+            path.setStroke(this.color);
+        return path;
+    }
+
     void display(GraphicsContext g){
         g.beginPath();
         for(vertex v: vertices){
@@ -99,15 +110,24 @@ class object{
 
 class player extends object{
     double center_x, center_y, radius;
+    Color color = Color.GREEN;
 
     @Override
     Path get_path(){
         Path path = new Path();
-        path.getElements().add(new MoveTo(vertices[0].x, vertices[0].y));
-        for(vertex v: vertices){
-            path.getElements().add(new LineTo(v.x, v.y));
-        }
-        path.getElements().add(new ClosePath());
+        ArcTo arcTo = new ArcTo();
+        arcTo.setX(center_x+1); // to simulate a full 360 degree celcius circle.
+        arcTo.setY(center_y-radius);
+        arcTo.setSweepFlag(false);
+        arcTo.setLargeArcFlag(true);
+        arcTo.setRadiusX(radius);
+        arcTo.setRadiusY(radius);
+        arcTo.setXAxisRotation(0);
+
+        path.getElements().addAll(
+                        new MoveTo(center_x, center_y-radius),
+                        arcTo,
+                        new ClosePath()); // close 1 px gap.;
         return path;
     }
 
@@ -117,5 +137,6 @@ class player extends object{
         g.strokeOval(center_x-radius, center_y-radius, radius * 2, radius * 2);
         g.closePath();
         g.stroke();
+        g.fillRect(center_x,center_y, 10, 10);
     }
 }

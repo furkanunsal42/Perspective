@@ -16,33 +16,27 @@ public class Render2D extends Application {
     public void start(Stage primary_stage){
         Pane root = new Pane();
 
-
-
         object shape = new object(new vertex[]{
-                new vertex(200, 100),
-                new vertex(100, 400),
-                new vertex(200, 500),
-                new vertex(300, 460)});
+                new vertex(0, 600),
+                new vertex(0, 500),
+                new vertex(800, 500),
+                new vertex(800, 600)});
+        shape.color = Color.DARKGRAY;
 
         object shape2 = new object(new vertex[]{
-                new vertex(400, 400),
-                new vertex(100, 300),
-                new vertex(300, 100),
-                new vertex(400, 260)});
+                new vertex(600, 100),
+                new vertex(600, 200),
+                new vertex(700, 200),
+                new vertex(700, 100)});
+        shape2.color = Color.GOLD;
 
-        player p = new player();
-        p.radius = 50;
-        p.center_x = 300;
-        p.center_y = 300;
+        player p = new player(300, 300, 50);
 
         System.out.println( shape.does_collide(shape2));
 
-        Canvas canvas = new Canvas(800, 600);
-        GraphicsContext g = canvas.getGraphicsContext2D();
-        root.getChildren().add(canvas);
-        root.getChildren().add(shape.get_path(true));
-        root.getChildren().add(shape2.get_path(true));
-        root.getChildren().add(p.get_path(true));
+        root.getChildren().add(shape.get_path(true, true));
+        root.getChildren().add(shape2.get_path(true,true));
+        root.getChildren().add(p.get_path(true,true));
         Scene scene = new Scene(root, 800, 600);
         primary_stage.setScene(scene);
         primary_stage.show();
@@ -88,12 +82,15 @@ class object{
         return path;
     }
 
-    Path get_path(boolean fill){
+    Path get_path(boolean fill, boolean stroke){
         Path path = this.get_path();
-        if (fill)
+        if (fill) {
+            path.setStrokeWidth(0);
             path.setFill(this.color);
-        else
-            path.setStroke(this.color);
+        }
+        if (stroke)
+            path.setStrokeWidth(1);
+            path.setStroke(Color.BLACK);
         return path;
     }
 
@@ -109,8 +106,17 @@ class object{
 }
 
 class player extends object{
+
     double center_x, center_y, radius;
     Color color = Color.GREEN;
+
+    public player(){}
+
+    public player(double x, double y, double radii){
+        this.center_x = x;
+        this.center_y = y;
+        this.radius = radii;
+    }
 
     @Override
     Path get_path(){

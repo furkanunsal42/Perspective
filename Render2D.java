@@ -1,14 +1,20 @@
+import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
+import javafx.scene.shape.Shape;
 import javafx.stage.Stage;
 
+
 public class Render2D extends Application {
+    byte move_x = 0, move_y = 0;
+    int speed = 10;
     public static void main(String[] args){
         launch(args);
     }
@@ -32,12 +38,51 @@ public class Render2D extends Application {
 
         player p = new player(300, 300, 50);
 
-        System.out.println( shape.does_collide(shape2));
+        Canvas canvas = new Canvas(800, 600);
+        GraphicsContext g = canvas.getGraphicsContext2D();
 
-        root.getChildren().add(shape.get_path(true, true));
-        root.getChildren().add(shape2.get_path(true,true));
-        root.getChildren().add(p.get_path(true,true));
+
+        AnimationTimer object_renderer = new AnimationTimer() {
+            @Override
+            public void handle(long l) {
+                g.clearRect(0, 0, 800, 600);
+                shape.display(g, true, true);
+                shape2.display(g, true, true);
+                p.display(g, true, true);
+            }
+        };
+        object_renderer.start();
+
+
+        root.getChildren().add(canvas);
         Scene scene = new Scene(root, 800, 600);
+
+        primary_stage.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+            System.out.println(event.getCode());
+            switch (event.getCode()){
+                case W -> move_y = -1;
+                case S -> move_y = 1;
+                case A -> move_x = -1;
+                case D -> move_x = +1;
+            }
+        });
+        primary_stage.addEventHandler(KeyEvent.KEY_RELEASED, event -> {
+            switch (event.getCode()){
+                case W, S -> move_y = 0;
+                case A, D -> move_x = 0;
+            }
+        });
+
+        AnimationTimer movement = new AnimationTimer() {
+            @Override
+            public void handle(long l) {
+                System.out.println(p.center_x);
+                p.center_x += move_x * speed;
+                p.center_y += move_y * speed;
+            }
+        };
+        movement.start();
+
         primary_stage.setScene(scene);
         primary_stage.show();
     }
@@ -103,6 +148,24 @@ class object{
         g.setFill(Color.SILVER);
         g.stroke();
     }
+
+    void display(GraphicsContext g, boolean fill, boolean stroke){
+        g.beginPath();
+        for(vertex v: vertices){
+            g.lineTo(v.x, v.y);
+        }
+        g.closePath();
+        if (fill) {
+            g.setLineWidth(0);
+            g.setFill(this.color);
+            g.fill();
+        }
+        if (stroke) {
+            g.setLineWidth(1);
+            g.setStroke(Color.BLACK);
+            g.stroke();
+        }
+    }
 }
 
 class player extends object{
@@ -144,5 +207,22 @@ class player extends object{
         g.closePath();
         g.stroke();
         g.fillRect(center_x,center_y, 10, 10);
+    }
+
+    @Override
+    void display(GraphicsContext g, boolean fill, boolean stroke){
+        g.beginPath();
+        g.strokeOval(center_x-radius, center_y-radius, radius * 2, radius * 2);
+        g.closePath();
+        if (fill) {
+            g.setLineWidth(0);
+            g.setFill(this.color);
+            g.fill();
+        }
+        if (stroke) {
+            g.setLineWidth(1);
+            g.setStroke(Color.BLACK);
+            g.stroke();
+        }
     }
 }

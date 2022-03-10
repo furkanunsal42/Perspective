@@ -129,12 +129,12 @@ public class Render2D extends Application {
                         // runs every 1/100 second (10 ms)
                         if (now - previous_time > 1_0 * 1_000_000) {
                             // gravity
+                            p.velocity.y += +1;
                             previous_time = now;
                             p.apply_physics_movements();
 
                         }
                         // physics calculations
-                        p.velocity.y += +1;
                         // collusion
                         p.escape_collision(obj);
 

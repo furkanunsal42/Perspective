@@ -11,7 +11,6 @@ import javafx.scene.shape.*;
 import javafx.scene.shape.Shape;
 import javafx.stage.Stage;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 
 public class Render2D extends Application {
@@ -272,13 +271,13 @@ class Player extends Object{
 
         double original_x = center_x, original_y = center_y;
         double result_x = center_x, result_y = center_y;
-        int min_change = 0;
+        int min_change = 00;
         for (int i = 0; i < all_direction_vectors.length; i++){
             int current_change = 0;
-            while(this.does_collide(colliding_object)) {
+            while(this.does_collide(colliding_object) && (i == 0 || current_change < min_change)) {
                 current_change++;
-                center_x += all_direction_vectors[i].x * 4;
-                center_y += all_direction_vectors[i].y * 4;
+                center_x += all_direction_vectors[i].x*2;
+                center_y += all_direction_vectors[i].y*2;
             }
             if(i == 0 || current_change < min_change){
                 min_change = current_change;

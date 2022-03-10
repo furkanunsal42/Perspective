@@ -63,15 +63,16 @@ public class Render2D extends Application {
 
         Player p = new Player(300, 300, 50);
         initialize_movement_system(primary_stage, p);
-        initialize_collision_system(p);
-
+        initialize_physics_system(p);
     }
 
     static void initialize_movement_system(Stage primary_stage, Player p){
 
         primary_stage.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
             switch (event.getCode()){
-                case W -> move_inverse_y = true;
+                case W -> {
+                    if (p.velocity.y < 3 && p.velocity.y > -3) p.velocity.y = -20;
+                }
                 case S -> move_y = true;
                 case A -> move_inverse_x = true;
                 case D -> move_x = true;
@@ -118,19 +119,27 @@ public class Render2D extends Application {
 
     }
 
-    static void initialize_collision_system(Player p){
-        AnimationTimer collision_system = new AnimationTimer() {
+    static void initialize_physics_system(Player p){
+        AnimationTimer physics_system = new AnimationTimer() {
             @Override
             public void handle(long l) {
                 for (Object obj: Object.all_objects){
                     if (!(obj instanceof Player)) {
+
+                        // gravity
+                        p.apply_physics_movements();
+                        p.velocity.y += +2;
+
+                        // collusion
                         p.escape_collision(obj);
+
                     }
                 }
             }
         };
-        collision_system.start();
+        physics_system.start();
     }
+
 }
 
 class Vertex{
@@ -226,6 +235,8 @@ class Object{
 
 class Player extends Object{
 
+    Vertex velocity = new Vertex(0, 0);
+
     double center_x, center_y, radius;
     Color color = Color.DARKRED;
 
@@ -271,13 +282,13 @@ class Player extends Object{
 
         double original_x = center_x, original_y = center_y;
         double result_x = center_x, result_y = center_y;
-        int min_change = 00;
+        int min_change = 0;
         for (int i = 0; i < all_direction_vectors.length; i++){
             int current_change = 0;
             while(this.does_collide(colliding_object) && (i == 0 || current_change < min_change)) {
                 current_change++;
-                center_x += all_direction_vectors[i].x*2;
-                center_y += all_direction_vectors[i].y*2;
+                center_x += all_direction_vectors[i].x;
+                center_y += all_direction_vectors[i].y;
             }
             if(i == 0 || current_change < min_change){
                 min_change = current_change;
@@ -289,6 +300,15 @@ class Player extends Object{
         }
         center_x = result_x;
         center_y = result_y;
+        if (min_change != 0){
+            velocity.x = 0;
+            velocity.y = 0;
+        }
+    }
+
+    public void apply_physics_movements(){
+        center_x += velocity.x;
+        center_y += velocity.y;
     }
 
     @Override

@@ -1,0 +1,18 @@
+3D
+- 3d graphics 								                        work in progress
+- rotating the world 							                    work in progress
+- displaying the 2d world in slice 					                not started
+- transition to 2d animation						                not started
+
+
+2D
+- character movement system						                    done needs improvements later
+- collision with walls							                    done
+- gravity								                            done needs improvements later
+- saving the player when stuck inside a wall 				        done
+- 2d graphics 								                        done needs improvements later
+- different types of walls (different intersections with player)	not started
+
+
+3D-2D
+- finding the collision points of 3d objects with the slice		    not started

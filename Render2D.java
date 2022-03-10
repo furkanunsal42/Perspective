@@ -48,37 +48,48 @@ public class Render2D extends Application {
     }
 
     static void create_map_1(Stage primary_stage, Pane root){
-        Object shape = new Object(new Vertex[]{
+        // this function initialize the objects in the first map
+
+        // definition of floor object
+        Object platform = new Object(new Vertex[]{
                 new Vertex(0, 600),
                 new Vertex(0, 500),
                 new Vertex(800, 500),
                 new Vertex(800, 600)});
-        shape.color = Color.DARKGRAY;
+        platform.color = Color.DARKGRAY;
 
-        Object shape2 = new Object(new Vertex[]{
+        // definition of golden rectangle
+        Object rect = new Object(new Vertex[]{
                 new Vertex(600, 100),
                 new Vertex(600, 200),
                 new Vertex(700, 200),
                 new Vertex(700, 100)});
-        shape2.color = Color.GOLD;
+        rect.color = Color.GOLD;
 
+        // definition of the player
         Player p = new Player(300, 300, 50);
+
+        // starting the movement system (W A S D control of the player)
         initialize_movement_system(primary_stage, p);
+
+        // starting the physics system (collision control and gravity)
         initialize_physics_system(p);
     }
 
     static void initialize_movement_system(Stage primary_stage, Player p){
-
+        // detect pressing of W A S D buttons
         primary_stage.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
             switch (event.getCode()){
                 case W -> {
                     if (p.velocity.y < 3 && p.velocity.y > -3) p.velocity.y = -20;
+                    // if player has low vertical velocity then give it a high upward velocity
                 }
                 case A -> move_inverse_x = true;
                 case D -> move_x = true;
             }
         });
 
+        // detect releasing of W A S D buttons
         primary_stage.addEventHandler(KeyEvent.KEY_RELEASED, event -> {
             switch (event.getCode()){
                 case A -> {
@@ -92,17 +103,24 @@ public class Render2D extends Application {
             }
         });
 
+        // updating velocity variable based on key presses
         AnimationTimer movement = new AnimationTimer() {
             long previous_time = 0;
             @Override
             public void handle(long now) {
-                // runs every 1/100 second (10 ms)
-                if (now - previous_time > 1_0 * 1_000_000) {
+                // runs every 1/100 second 10ms(10 * 1_000_000 nanoseconds)
+                if (now - previous_time > 10 * 1_000_000) {
+                    // to calculate the time passed since last run we have to remember the current time
                     previous_time = now;
 
+                    // if move_x is active and velocity is lower than max_speed
                     if(move_x && Math.abs(p.velocity.x) < max_speed)
+                        // increase speed
                         p.velocity.x += speed;
+
+                    // if move_inverse_x is active and velocity is lower than max_speed
                     if(move_inverse_x && Math.abs(p.velocity.x) < max_speed)
+                        // increase speed
                         p.velocity.x -= speed;
                 }
             }
@@ -111,12 +129,16 @@ public class Render2D extends Application {
     }
 
     static void initialize_rendering_cycle(GraphicsContext g, Object[] objects){
+        // this function renders every object into the scene
         AnimationTimer object_renderer = new AnimationTimer() {
             @Override
             public void handle(long l) {
+                // clear the canvas before rendering anything otherwise previous images from last frame still be present in the scene
                 g.clearRect(0, 0, 800, 600);
 
+                // for every object created
                 for(Object obj: objects){
+                    // render that object
                     obj.display(g, true, true);
                 }
             }
@@ -126,17 +148,23 @@ public class Render2D extends Application {
     }
 
     static void initialize_physics_system(Player p){
+        // this function calculates the collision and gravity for player
         AnimationTimer physics_system = new AnimationTimer() {
             long previous_time = 0;
             @Override
             public void handle(long now) {
                 for (Object obj: Object.all_objects){
+                    // for every object that is not player
                     if (!(obj instanceof Player)) {
                         // runs every 1/100 second (10 ms)
                         if (now - previous_time > 1_0 * 1_000_000) {
-                            // gravity
                             previous_time = now;
+
+                            // gravity
+
+                            // increase downward velocity (because of gravity)
                             p.velocity.y += +1;
+                            // update location based on velocity
                             p.apply_physics_movements();
 
                         }
@@ -152,6 +180,10 @@ public class Render2D extends Application {
 }
 
 class Vertex{
+    // keep in mind that
+    // a vertex can be used for a 2d point or a 2d vector
+
+    // it only consists of x and y location property
     public Vertex(double x, double y){
         this.x = x;
         this.y = y;
@@ -160,25 +192,47 @@ class Vertex{
 }
 
 class Object{
+    // Object is the general class for every wall and player
+
+    // every time a object is created that object is stored in all_object list
     public static ArrayList<Object> all_objects = new ArrayList<Object>();
+
+    // every vertex of the object is stored at vertex array: vertices
     Vertex[] vertices;
+
+    // color of the object
     Color color = Color.GREEN;
+
     public Object(){
+        // once a object is created add it to all_object list
         all_objects.add(this);
     }
 
     public Object(Vertex[] input_vertices){
+        // set vertex array
         this.vertices = new Vertex[input_vertices.length];
         for(int i = 0; i < input_vertices.length; i++)
             this.vertices[i] = input_vertices[i];
+
+        // once a object is created add it to all_object list
         all_objects.add(this);
     }
 
+    ObservableList<PathElement> get_collision(Object obj){
+        // this function returns the collision area between a given object and this object
+        return ((Path)Shape.intersect(this.get_path(), obj.get_path())).getElements();
+    }
+
     boolean does_collide(Object obj){
-        return ((Path)Shape.intersect(this.get_path(), obj.get_path())).getElements().size() > 0;
+        // this function returns true is object collides with given obj. if not, returns false
+        return (get_collision(obj).size() > 0);
     }
 
     public void escape_collision(Object colliding_object){
+        // teleports the object to nearest location that wouldn't cause a collusion
+        // this function isn't in its final state since actually player's definion of the class is used rather than this
+        // this function is not important for 2d game
+
         while(this.does_collide(colliding_object)){
             for(Vertex v: vertices){
                 //v.x += direction_vector.x;
@@ -187,21 +241,30 @@ class Object{
         }
     }
 
-    ObservableList<PathElement> get_collision(Object obj){
-        return ((Path)Shape.intersect(this.get_path(), obj.get_path())).getElements();
-    }
-
     Path get_path(){
+        // returns the object's shape as a path for drawing or collision purposes
+
+        // create a path
         Path path = new Path();
+
+        // begin the path from the first vertex
         path.getElements().add(new MoveTo(vertices[0].x, vertices[0].y));
+
+        // for every vertex, continue to draw the line
         for(Vertex v: vertices){
             path.getElements().add(new LineTo(v.x, v.y));
         }
+
+        // finish the line
         path.getElements().add(new ClosePath());
+
         return path;
     }
 
     Path get_path(boolean fill, boolean stroke){
+        // this function returns the path as a stroke or a fill or both but doesn't used since I decided not to add the path's into root
+        // but to draw them to canvas
+
         Path path = this.get_path();
         if (fill) {
             path.setStrokeWidth(0);
@@ -214,6 +277,8 @@ class Object{
     }
 
     void display(GraphicsContext g){
+        // basic rendering function for an object
+
         g.beginPath();
         for(Vertex v: vertices){
             g.lineTo(v.x, v.y);
@@ -224,6 +289,8 @@ class Object{
     }
 
     void display(GraphicsContext g, boolean fill, boolean stroke){
+        // same function with the other display() but it has fill or stroke options
+
         g.beginPath();
         for(Vertex v: vertices){
             g.lineTo(v.x, v.y);
@@ -243,20 +310,27 @@ class Object{
 }
 
 class Player extends Object{
+    // Player class is a child class of Object
+    // one of the main differences of player is that it is a circle so, it is not defined as vertex but an arc path
 
+    // velocity vector is represented with a vertex
     Vertex velocity = new Vertex(0, 0);
 
+    // location is represented with two double variables but IT SHOULD BECOME VERTEX AT SOME POINT
     double center_x, center_y, radius;
     Color color = Color.DARKRED;
 
+    // it is possible to create a player with no parameters
     public Player(){}
 
+    // it is possible to create a player with parameters
     public Player(double x, double y, double radii){
         this.center_x = x;
         this.center_y = y;
         this.radius = radii;
     }
 
+    // get_path works with circular arcs rather than vertices
     @Override
     Path get_path(){
         Path path = new Path();
@@ -276,6 +350,7 @@ class Player extends Object{
         return path;
     }
 
+    // same as normal escape_collision but rather than moving vertices center point is moved
     @Override
     public void escape_collision(Object colliding_object){
         Vertex[] all_direction_vectors = new Vertex[]{
@@ -314,11 +389,13 @@ class Player extends Object{
         }
     }
 
+    // update position based on velocity
     public void apply_physics_movements(){
         center_x += velocity.x;
         center_y += velocity.y;
     }
 
+    // draw the player (circle) on the canvas
     @Override
     void display(GraphicsContext g){
         g.beginPath();
@@ -328,6 +405,7 @@ class Player extends Object{
         g.fillRect(center_x,center_y, 10, 10);
     }
 
+    // same as other display function but with fill/stroke option
     @Override
     void display(GraphicsContext g, boolean fill, boolean stroke){
         if (fill) {

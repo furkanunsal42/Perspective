@@ -81,8 +81,13 @@ public class Render2D extends Application {
         primary_stage.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
             switch (event.getCode()){
                 case W -> {
-                    if (p.velocity.y < 3 && p.velocity.y > -3) p.velocity.y = -20;
-                    // if player has low vertical velocity then give it a high upward velocity
+                    if (p.can_jump){
+                        // if player is able to jump then give it a high upward velocity
+                        p.velocity.y = -20;
+
+                        // make the player unable to jump again in the air
+                        p.can_jump = false;
+                    }
                 }
                 case A -> move_inverse_x = true;
                 case D -> move_x = true;
@@ -320,6 +325,8 @@ class Player extends Object{
     double center_x, center_y, radius;
     Color color = Color.DARKRED;
 
+    boolean can_jump = false;
+
     // it is possible to create a player with no parameters
     public Player(){}
 
@@ -353,6 +360,7 @@ class Player extends Object{
     // same as normal escape_collision but rather than moving vertices center point is moved
     @Override
     public void escape_collision(Object colliding_object){
+        // have all 8 directions
         Vertex[] all_direction_vectors = new Vertex[]{
                 new Vertex(0, -1),  // up
                 new Vertex(1, 0),   // right
@@ -363,29 +371,55 @@ class Player extends Object{
                 new Vertex(-1, 1),  // bottom-left
                 new Vertex(-1, -1),  // top-left
         };
-
+        // save original x and y values
         double original_x = center_x, original_y = center_y;
         double result_x = center_x, result_y = center_y;
+
+        // each iteration counts the change number, minimum of them is saved here
         int min_change = 0;
+        int top_change = 0;
+        // for each direction
         for (int i = 0; i < all_direction_vectors.length; i++){
             int current_change = 0;
+
+            // push the player toward the direction as long as it still collides
+            // an optimization is that if we already pushed the player more than minimum amount we can skip this direction
             while(this.does_collide(colliding_object) && (i == 0 || current_change < min_change)) {
+                // count the push count
                 current_change++;
+
+                // push the player
                 center_x += all_direction_vectors[i].x;
                 center_y += all_direction_vectors[i].y;
             }
+
+            // if this direction was the closest then save it
+            // if this was the very first direction then again, save it
             if(i == 0 || current_change < min_change){
                 min_change = current_change;
                 result_x = center_x;
                 result_y = center_y;
             }
+            // remember the push amount for top direction, this information will be useful to reset can_jump
+            if (i == 0)
+                top_change = current_change;
+
+            // set the player to it's original position to check other directions too
             center_y = original_y;
             center_x = original_x;
         }
+        // teleport the player to saved (closest, non-colliding) location
         center_x = result_x;
         center_y = result_y;
+
+        // if it was in collusion then it must have hit something, reset its velocity
         if (min_change != 0){
             velocity.y = 0;
+
+            // if player is on top of something, reset can_jump
+            if (min_change == top_change){
+                can_jump = true;
+            }
         }
     }
 

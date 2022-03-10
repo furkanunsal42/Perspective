@@ -15,7 +15,7 @@ import java.util.ArrayList;
 
 public class Render2D extends Application {
     // define boolean movement parameters (each direction has it's boolean so that we can have a smoother movement system)
-    static boolean move_x = false, move_inverse_x = false, move_y = false, move_inverse_y = false;
+    static boolean move_x = false, move_inverse_x = false, move_jump = false;
 
     // define movement speed
     static int speed = 2;
@@ -80,15 +80,7 @@ public class Render2D extends Application {
         // detect pressing of W A S D buttons
         primary_stage.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
             switch (event.getCode()){
-                case W -> {
-                    if (p.can_jump){
-                        // if player is able to jump then give it a high upward velocity
-                        p.velocity.y = -20;
-
-                        // make the player unable to jump again in the air
-                        p.can_jump = false;
-                    }
-                }
+                case W -> move_jump = true;
                 case A -> move_inverse_x = true;
                 case D -> move_x = true;
             }
@@ -97,6 +89,8 @@ public class Render2D extends Application {
         // detect releasing of W A S D buttons
         primary_stage.addEventHandler(KeyEvent.KEY_RELEASED, event -> {
             switch (event.getCode()){
+                case W -> move_jump = false;
+
                 case A -> {
                     p.velocity.x = 0;
                     move_inverse_x = false;
@@ -127,6 +121,15 @@ public class Render2D extends Application {
                     if(move_inverse_x && Math.abs(p.velocity.x) < max_speed)
                         // increase speed
                         p.velocity.x -= speed;
+
+                    // if move_jump is active and able to jump
+                    if (move_jump && p.can_jump){
+                        // if player is able to jump then give it a high upward velocity
+                        p.velocity.y = -20;
+
+                        // make the player unable to jump again in the air
+                        p.can_jump = false;
+                    }
                 }
             }
         };

@@ -18,7 +18,8 @@ public class Render2D extends Application {
     static boolean move_x = false, move_inverse_x = false, move_y = false, move_inverse_y = false;
 
     // define movement speed
-    static int speed = 4;
+    static int speed = 2;
+    static int max_speed = 10;
 
     // main method (launches start function)
     public static void main(String[] args){
@@ -73,7 +74,6 @@ public class Render2D extends Application {
                 case W -> {
                     if (p.velocity.y < 3 && p.velocity.y > -3) p.velocity.y = -20;
                 }
-                case S -> move_y = true;
                 case A -> move_inverse_x = true;
                 case D -> move_x = true;
             }
@@ -81,24 +81,30 @@ public class Render2D extends Application {
 
         primary_stage.addEventHandler(KeyEvent.KEY_RELEASED, event -> {
             switch (event.getCode()){
-                case W -> move_inverse_y = false;
-                case S -> move_y = false;
-                case A -> move_inverse_x = false;
-                case D -> move_x = false;
+                case A -> {
+                    p.velocity.x = 0;
+                    move_inverse_x = false;
+                }
+                case D -> {
+                    p.velocity.x = 0;
+                    move_x = false;
+                }
             }
         });
 
         AnimationTimer movement = new AnimationTimer() {
+            long previous_time = 0;
             @Override
-            public void handle(long l) {
-                if(move_x)
-                    p.center_x += speed;
-                if(move_inverse_x)
-                    p.center_x -= speed;
-                if(move_y)
-                    p.center_y += speed;
-                if(move_inverse_y)
-                    p.center_y -= speed;
+            public void handle(long now) {
+                // runs every 1/100 second (10 ms)
+                if (now - previous_time > 1_0 * 1_000_000) {
+                    previous_time = now;
+
+                    if(move_x && Math.abs(p.velocity.x) < max_speed)
+                        p.velocity.x += speed;
+                    if(move_inverse_x && Math.abs(p.velocity.x) < max_speed)
+                        p.velocity.x -= speed;
+                }
             }
         };
         movement.start();
@@ -129,15 +135,13 @@ public class Render2D extends Application {
                         // runs every 1/100 second (10 ms)
                         if (now - previous_time > 1_0 * 1_000_000) {
                             // gravity
-                            p.velocity.y += +1;
                             previous_time = now;
+                            p.velocity.y += +1;
                             p.apply_physics_movements();
 
                         }
-                        // physics calculations
                         // collusion
                         p.escape_collision(obj);
-
                     }
                 }
             }
@@ -306,7 +310,6 @@ class Player extends Object{
         center_x = result_x;
         center_y = result_y;
         if (min_change != 0){
-            velocity.x = 0;
             velocity.y = 0;
         }
     }

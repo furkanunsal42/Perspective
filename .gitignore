@@ -6,3 +6,12 @@
 .idea/misc.xml
 .idea/libraries/lib.xml
 *.xml
+*.class
+*.class
+out/production/Perspective/object.class
+out/production/Perspective/player.class
+out/production/Perspective/Render2D$1.class
+out/production/Perspective/Render2D$2.class
+out/production/Perspective/Render2D$3.class
+out/production/Perspective/Render2D.class
+out/production/Perspective/vertex.class

@@ -121,15 +121,20 @@ public class Render2D extends Application {
 
     static void initialize_physics_system(Player p){
         AnimationTimer physics_system = new AnimationTimer() {
+            long previous_time = 0;
             @Override
-            public void handle(long l) {
+            public void handle(long now) {
                 for (Object obj: Object.all_objects){
                     if (!(obj instanceof Player)) {
+                        // runs every 1/100 second (10 ms)
+                        if (now - previous_time > 1_0 * 1_000_000) {
+                            // gravity
+                            previous_time = now;
+                            p.apply_physics_movements();
 
-                        // gravity
-                        p.apply_physics_movements();
-                        p.velocity.y += +2;
-
+                        }
+                        // physics calculations
+                        p.velocity.y += +1;
                         // collusion
                         p.escape_collision(obj);
 

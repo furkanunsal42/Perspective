@@ -2,6 +2,7 @@ import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.geometry.Point3D;
 import javafx.scene.Camera;
+import javafx.scene.Group;
 import javafx.scene.PerspectiveCamera;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
@@ -10,6 +11,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
 import javafx.scene.transform.Rotate;
 import javafx.stage.Stage;
+
+import java.util.ArrayList;
 
 
 public class Render3D extends Application{
@@ -23,8 +26,6 @@ public class Render3D extends Application{
     @Override
     public void start(Stage primary_stage){
         Pane root = new Pane();
-
-
 
         Sphere sphere = new Sphere(50);
         sphere.setTranslateX(200);
@@ -117,6 +118,58 @@ public class Render3D extends Application{
         primary_stage.setScene(scene);
         primary_stage.show();
 
+    }
+}
+
+class Object3D{
+    Shape3D mesh;
+    static ArrayList<Object3D> all_objects = new ArrayList<>();
+
+    public Object3D(){
+        all_objects.add(this);
+    }
+    public Object3D(Shape3D mesh){
+        all_objects.add(this);
+        this.mesh = mesh;
+    }
+
+    // about display:
+    // there is no integrated way in javafx to draw 3D shapes using canvas and graphical context
+    // so object3d instances will be displayed by adding them to scene directly
+    // so no need to implement a void display method
+}
+
+class Vertex3D{
+    // a vertex3d can be used to represent a 3d point or a 3d vector
+    double x, y, z;
+    public Vertex3D(double x, double y, double z){
+        this.x = x;
+        this.y = y;
+        this.z = z;
+    }
+}
+
+class Map{
+    ArrayList<Object3D> world_objects = new ArrayList<>();
+    Group object_group = new Group();
+    Vertex3D rotation;
+    Vertex3D position;
+
+    public void update_object_group(){
+        // recreate object_group from world_objects
+        object_group.getChildren().clear();
+        for (Object3D obj: world_objects) {
+            object_group.getChildren().add(obj.mesh);
+        }
+        // apply rotation to group
+        object_group.getTransforms().add(new Rotate(rotation.x, new Point3D(1, 0, 0)));
+        object_group.getTransforms().add(new Rotate(rotation.y, new Point3D(0, 1, 0)));
+        object_group.getTransforms().add(new Rotate(rotation.z, new Point3D(0, 0, 1)));
+
+        // apply position to group
+        object_group.translateXProperty().set(position.x);
+        object_group.translateXProperty().set(position.y);
+        object_group.translateXProperty().set(position.z);
     }
 }
 

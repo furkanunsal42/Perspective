@@ -104,12 +104,13 @@ public class Render2D extends Application {
 
         // updating velocity variable based on key presses
         AnimationTimer movement = new AnimationTimer() {
+            // time that previous frame was rendered (in nanoseconds)
             long previous_time = 0;
             @Override
             public void handle(long now) {
                 // runs every 1/100 second 10ms(10 * 1_000_000 nanoseconds)
                 if (now - previous_time > 10 * 1_000_000) {
-                    // to calculate the time passed since last run we have to remember the current time
+                    // to calculate the time passed since last run, we have to remember the previous time
                     previous_time = now;
 
                     // if move_x is active and velocity is lower than max_speed

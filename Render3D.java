@@ -21,6 +21,8 @@ import java.util.ArrayList;
 public class Render3D extends Application{
     boolean move_x=false, move_inverse_x=false, move_y=false, move_inverse_y=false, move_z=false, move_inverse_z=false;
     boolean rotate_x=false, rotate_inverse_x=false, rotate_y=false, rotate_inverse_y=false, rotate_z=false, rotate_inverse_z=false;
+    double movement_speed = 2;
+    double rotation_speed = .5;
 
     public static void main(String[] args){
         launch(args);
@@ -105,29 +107,29 @@ public class Render3D extends Application{
                 });
 
                 if (move_x)
-                    map.object_group.translateXProperty().set(map.object_group.getTranslateX() - 10);
+                    map.object_group.translateXProperty().set(map.object_group.getTranslateX() - movement_speed);
                 if (move_inverse_x)
-                    map.object_group.translateXProperty().set(map.object_group.getTranslateX() + 10);
+                    map.object_group.translateXProperty().set(map.object_group.getTranslateX() + movement_speed);
                 if (move_y)
-                    map.object_group.translateYProperty().set(map.object_group.getTranslateY() - 10);
+                    map.object_group.translateYProperty().set(map.object_group.getTranslateY() - movement_speed);
                 if (move_inverse_y)
-                    map.object_group.translateYProperty().set(map.object_group.getTranslateY() + 10);
+                    map.object_group.translateYProperty().set(map.object_group.getTranslateY() + movement_speed);
                 if (move_z)
-                    map.object_group.translateZProperty().set(map.object_group.getTranslateZ() + 10);
+                    map.object_group.translateZProperty().set(map.object_group.getTranslateZ() + movement_speed);
                 if (move_inverse_z)
-                    map.object_group.translateZProperty().set(map.object_group.getTranslateZ() - 10);
+                    map.object_group.translateZProperty().set(map.object_group.getTranslateZ() - movement_speed);
                 if (rotate_x)
-                    map.object_group.getTransforms().add(new Rotate(-2, new Point3D(1, 0, 0)));
+                    map.object_group.getTransforms().add(new Rotate(- rotation_speed, new Point3D(1, 0, 0)));
                 if (rotate_inverse_x)
-                    map.object_group.getTransforms().add(new Rotate(+2, new Point3D(1, 0, 0)));
+                    map.object_group.getTransforms().add(new Rotate(+ rotation_speed, new Point3D(1, 0, 0)));
                 if (rotate_y)
-                    map.object_group.getTransforms().add(new Rotate(+2, new Point3D(0, 1, 0)));
+                    map.object_group.getTransforms().add(new Rotate(+ rotation_speed, new Point3D(0, 1, 0)));
                 if (rotate_inverse_y)
-                    map.object_group.getTransforms().add(new Rotate(-2, new Point3D(0, 1, 0)));
+                    map.object_group.getTransforms().add(new Rotate(- rotation_speed, new Point3D(0, 1, 0)));
                 if (rotate_z)
-                    map.object_group.getTransforms().add(new Rotate(+2, new Point3D(0, 0, 1)));
+                    map.object_group.getTransforms().add(new Rotate(+ rotation_speed, new Point3D(0, 0, 1)));
                 if (rotate_inverse_z)
-                    map.object_group.getTransforms().add(new Rotate(-2, new Point3D(0, 0, 1)));
+                    map.object_group.getTransforms().add(new Rotate(- rotation_speed, new Point3D(0, 0, 1)));
             }
         };
         movement.start();

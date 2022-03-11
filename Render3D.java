@@ -30,42 +30,58 @@ public class Render3D extends Application{
 
     @Override
     public void start(Stage primary_stage){
+        // set standard javafx stage
+        set_stage(primary_stage);
+
+        // create the first map
+        create_world_1(primary_stage);
+    }
+
+    public void set_stage(Stage stage){
         // standard javafx windows elements
         Pane root = new Pane();
         Scene scene = new Scene(root, 800, 600, true);
-        Camera camera =  new PerspectiveCamera();
-        scene.setCamera(camera);
         scene.setFill(Color.BLACK);
-        primary_stage.setScene(scene);
-        primary_stage.show();
-
-        // create the first map
-        create_world_1(primary_stage, root);
+        stage.setScene(scene);
+        stage.show();
     }
 
-    public void create_world_1(Stage stage, Pane root){
+    public void create_world_1(Stage stage){
         // objects
-        Object3D sphere = new Object3D(new Sphere(50), 200, 200, 0);
-        Object3D prism1 = new Object3D(new Box(200, 300, 400), 100, 200, 10);
+        Object3D bottom_platform = new Object3D(new Box(1000, 100, 1000), 0, 600, 300);
+
+        Object3D target = new Object3D(new Box(1000, 100, 100), 0, 300, 600);
+        target.set_rotation(0, 0, -15);
+
         Object3D slice_panel = new Object3D(new Box(800, 600, 1), 300, 300, 300);
-        slice_panel.set_rotation(0, -45, 0);
-        PhongMaterial material = new PhongMaterial();
-        material.setDiffuseColor(new Color(0.2,0.2,0.2,0.4)); // Note alpha of 0.3
-        slice_panel.mesh.materialProperty().set(material);
+        slice_panel.set_rotation(0, -90, 0);
+        slice_panel.set_transparency(.8);
 
         // map
         Map map = new Map();
-        map.all_world_objects.add(sphere);
-        map.all_world_objects.add(prism1);
+        map.all_world_objects.add(bottom_platform);
+        map.all_world_objects.add(target);
         map.slice = slice_panel;
         map.update_object_group();
 
         // start movement system
         initialize_movement_system(stage, map);
 
+        // access to scene and root
+        Scene scene = stage.getScene();
+        Pane root = (Pane)scene.getRoot();
+
         // display objects in the scene
         root.getChildren().add(map.object_group);
         root.getChildren().add(map.slice.mesh);
+
+        // setup camera
+        PerspectiveCamera camera = new PerspectiveCamera();
+        camera.translateXProperty().set(500);
+        camera.translateYProperty().set(-500);
+        camera.translateZProperty().set(-500);
+        camera.getTransforms().add(new Rotate(-45, new Point3D(1, 1, 0)));
+        scene.setCamera(camera);
     }
 
     public void initialize_movement_system(Stage stage, Map map){
@@ -166,6 +182,13 @@ class Object3D{
     // there is no integrated way in javafx to draw 3D shapes using canvas and graphical context
     // so object3d instances will be displayed by adding them to scene directly
     // so no need to implement a void display method
+
+
+    public void set_transparency(double value){
+        PhongMaterial material = new PhongMaterial();
+        material.setDiffuseColor(new Color(.5, .5, .5, 1-value));
+        this.mesh.setMaterial(material);
+    }
 }
 
 class Vertex3D{
@@ -202,5 +225,6 @@ class Map{
         object_group.translateXProperty().set(position.y);
         object_group.translateXProperty().set(position.z);
     }
+
 }
 

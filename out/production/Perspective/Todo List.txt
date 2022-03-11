@@ -16,3 +16,8 @@
 
 3D-2D
 - finding the collision points of 3d objects with the slice		    not started
+
+
+Bug reports: (if you find a bug please report it here with a good description of why or when it happens)
+
+no known bugs

@@ -9,6 +9,8 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.Scene;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Material;
+import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.*;
 import javafx.scene.transform.Rotate;
 import javafx.stage.Stage;
@@ -31,7 +33,7 @@ public class Render3D extends Application{
         Scene scene = new Scene(root, 800, 600, true);
         Camera camera =  new PerspectiveCamera();
         scene.setCamera(camera);
-        scene.setFill(Color.SILVER);
+        scene.setFill(Color.BLACK);
         primary_stage.setScene(scene);
         primary_stage.show();
 
@@ -43,14 +45,17 @@ public class Render3D extends Application{
         // objects
         Object3D sphere = new Object3D(new Sphere(50), 200, 200, 0);
         Object3D prism1 = new Object3D(new Box(200, 300, 400), 100, 200, 10);
-        Object3D prism2 = new Object3D(new Box(800, 600, 1), 300, 300, 300);
-        prism2.set_rotation(0, -45, 0);
+        Object3D slice_panel = new Object3D(new Box(800, 600, 1), 300, 300, 300);
+        slice_panel.set_rotation(0, -45, 0);
+        PhongMaterial material = new PhongMaterial();
+        material.setDiffuseColor(new Color(0.2,0.2,0.2,0.4)); // Note alpha of 0.3
+        slice_panel.mesh.materialProperty().set(material);
 
         // map
         Map map = new Map();
-        map.world_objects.add(sphere);
-        map.world_objects.add(prism1);
-        map.world_objects.add(prism2);
+        map.all_world_objects.add(sphere);
+        map.all_world_objects.add(prism1);
+        map.slice = slice_panel;
         map.update_object_group();
 
         // start movement system
@@ -58,6 +63,7 @@ public class Render3D extends Application{
 
         // display objects in the scene
         root.getChildren().add(map.object_group);
+        root.getChildren().add(map.slice.mesh);
     }
 
     public void initialize_movement_system(Stage stage, Map map){
@@ -171,7 +177,9 @@ class Vertex3D{
 }
 
 class Map{
-    ArrayList<Object3D> world_objects = new ArrayList<>();
+    ArrayList<Object3D> all_world_objects = new ArrayList<>();
+    Object3D slice;
+
     Group object_group = new Group();
     Vertex3D rotation = new Vertex3D(0, 0, 0);
     Vertex3D position = new Vertex3D(0, 0, 0);
@@ -179,7 +187,7 @@ class Map{
     public void update_object_group(){
         // recreate object_group from world_objects
         object_group.getChildren().clear();
-        for (Object3D obj: world_objects) {
+        for (Object3D obj: all_world_objects) {
             object_group.getChildren().add(obj.mesh);
         }
         // apply rotation to group

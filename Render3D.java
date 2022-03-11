@@ -1,5 +1,6 @@
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
+import javafx.beans.binding.ObjectExpression;
 import javafx.geometry.Point3D;
 import javafx.scene.Camera;
 import javafx.scene.Group;
@@ -25,99 +26,101 @@ public class Render3D extends Application{
 
     @Override
     public void start(Stage primary_stage){
+        // standard javafx windows elements
         Pane root = new Pane();
-
-        Sphere sphere = new Sphere(50);
-        sphere.setTranslateX(200);
-        sphere.setTranslateY(200);
-        root.getChildren().add(sphere);
-
-        Box rect_prism = new Box(200, 300, 400);
-        rect_prism.setTranslateX(100);
-        rect_prism.setTranslateY(200);
-        rect_prism.setTranslateZ(10);
-
-        Box rect = new Box(800, 600, 1);
-        rect.translateXProperty().set(300);
-        rect.translateYProperty().set(300);
-        rect.translateZProperty().set(300);
-        rect.getTransforms().add(new Rotate(-45, new Point3D(0, 1, 0)));
-        root.getChildren().add(rect);
-        root.getChildren().add(rect_prism);
-
         Scene scene = new Scene(root, 800, 600, true);
         Camera camera =  new PerspectiveCamera();
         scene.setCamera(camera);
         scene.setFill(Color.SILVER);
-
-        AnimationTimer movement = new AnimationTimer() {
-            @Override
-            public void handle(long l) {
-                if (move_x)
-                    sphere.translateXProperty().set(sphere.getTranslateX() - 10);
-                if (move_inverse_x)
-                    sphere.translateXProperty().set(sphere.getTranslateX() + 10);
-                if (move_y)
-                    sphere.translateYProperty().set(sphere.getTranslateY() - 10);
-                if (move_inverse_y)
-                    sphere.translateYProperty().set(sphere.getTranslateY() + 10);
-                if (move_z)
-                    sphere.translateZProperty().set(sphere.getTranslateZ() + 10);
-                if (move_inverse_z)
-                    sphere.translateZProperty().set(sphere.getTranslateZ() - 10);
-                if (rotate_x)
-                    sphere.getTransforms().add(new Rotate(-2, new Point3D(1, 0, 0)));
-                if (rotate_inverse_x)
-                    sphere.getTransforms().add(new Rotate(+2, new Point3D(1, 0, 0)));
-                if (rotate_y)
-                    sphere.getTransforms().add(new Rotate(+2, new Point3D(0, 1, 0)));
-                if (rotate_inverse_y)
-                    sphere.getTransforms().add(new Rotate(-2, new Point3D(0, 1, 0)));
-                if (rotate_z)
-                    sphere.getTransforms().add(new Rotate(+2, new Point3D(0, 0, 1)));
-                if (rotate_inverse_z)
-                    sphere.getTransforms().add(new Rotate(-2, new Point3D(0, 0, 1)));
-            }
-        };
-
-        primary_stage.addEventHandler(KeyEvent.KEY_PRESSED, event ->{
-            switch (event.getCode()) {
-                case W -> move_z = true;
-                case S -> move_inverse_z = true;
-                case A -> move_x = true;
-                case D -> move_inverse_x = true;
-                case SHIFT -> move_y = true;
-                case CONTROL -> move_inverse_y = true;
-                case E -> rotate_z = true;
-                case Q -> rotate_inverse_z = true;
-                case R -> rotate_x = true;
-                case F -> rotate_inverse_x = true;
-                case Z -> rotate_y = true;
-                case X -> rotate_inverse_y = true;
-            }
-        });
-
-        primary_stage.addEventHandler(KeyEvent.KEY_RELEASED, event ->{
-            switch (event.getCode()) {
-                case W -> move_z = false;
-                case S -> move_inverse_z = false;
-                case A -> move_x = false;
-                case D -> move_inverse_x = false;
-                case SHIFT -> move_y = false;
-                case CONTROL -> move_inverse_y = false;
-                case E -> rotate_z = false;
-                case Q -> rotate_inverse_z = false;
-                case R -> rotate_x = false;
-                case F -> rotate_inverse_x = false;
-                case Z -> rotate_y = false;
-                case X -> rotate_inverse_y = false;
-            }
-        });
-        movement.start();
-
         primary_stage.setScene(scene);
         primary_stage.show();
 
+        // create the first map
+        create_world_1(primary_stage, root);
+    }
+
+    public void create_world_1(Stage stage, Pane root){
+        // objects
+        Object3D sphere = new Object3D(new Sphere(50), 200, 200, 0);
+        Object3D prism1 = new Object3D(new Box(200, 300, 400), 100, 200, 10);
+        Object3D prism2 = new Object3D(new Box(800, 600, 1), 300, 300, 300);
+        prism2.set_rotation(0, -45, 0);
+
+        // start movement system
+        initialize_movement_system(stage, prism2);
+
+        // display objects in the scene
+        root.getChildren().add(sphere.mesh);
+        root.getChildren().add(prism1.mesh);
+        root.getChildren().add(prism2.mesh);
+
+    }
+
+    public void initialize_movement_system(Stage stage, Object3D obj){
+        AnimationTimer movement = new AnimationTimer() {
+            @Override
+            public void handle(long l) {
+                stage.addEventHandler(KeyEvent.KEY_PRESSED, event ->{
+                    switch (event.getCode()) {
+                        case W -> move_z = true;
+                        case S -> move_inverse_z = true;
+                        case A -> move_x = true;
+                        case D -> move_inverse_x = true;
+                        case SHIFT -> move_y = true;
+                        case CONTROL -> move_inverse_y = true;
+                        case E -> rotate_z = true;
+                        case Q -> rotate_inverse_z = true;
+                        case R -> rotate_x = true;
+                        case F -> rotate_inverse_x = true;
+                        case Z -> rotate_y = true;
+                        case X -> rotate_inverse_y = true;
+                    }
+                });
+
+                stage.addEventHandler(KeyEvent.KEY_RELEASED, event ->{
+                    switch (event.getCode()) {
+                        case W -> move_z = false;
+                        case S -> move_inverse_z = false;
+                        case A -> move_x = false;
+                        case D -> move_inverse_x = false;
+                        case SHIFT -> move_y = false;
+                        case CONTROL -> move_inverse_y = false;
+                        case E -> rotate_z = false;
+                        case Q -> rotate_inverse_z = false;
+                        case R -> rotate_x = false;
+                        case F -> rotate_inverse_x = false;
+                        case Z -> rotate_y = false;
+                        case X -> rotate_inverse_y = false;
+                    }
+                });
+
+                if (move_x)
+                    obj.mesh.translateXProperty().set(obj.mesh.getTranslateX() - 10);
+                if (move_inverse_x)
+                    obj.mesh.translateXProperty().set(obj.mesh.getTranslateX() + 10);
+                if (move_y)
+                    obj.mesh.translateYProperty().set(obj.mesh.getTranslateY() - 10);
+                if (move_inverse_y)
+                    obj.mesh.translateYProperty().set(obj.mesh.getTranslateY() + 10);
+                if (move_z)
+                    obj.mesh.translateZProperty().set(obj.mesh.getTranslateZ() + 10);
+                if (move_inverse_z)
+                    obj.mesh.translateZProperty().set(obj.mesh.getTranslateZ() - 10);
+                if (rotate_x)
+                    obj.mesh.getTransforms().add(new Rotate(-2, new Point3D(1, 0, 0)));
+                if (rotate_inverse_x)
+                    obj.mesh.getTransforms().add(new Rotate(+2, new Point3D(1, 0, 0)));
+                if (rotate_y)
+                    obj.mesh.getTransforms().add(new Rotate(+2, new Point3D(0, 1, 0)));
+                if (rotate_inverse_y)
+                    obj.mesh.getTransforms().add(new Rotate(-2, new Point3D(0, 1, 0)));
+                if (rotate_z)
+                    obj.mesh.getTransforms().add(new Rotate(+2, new Point3D(0, 0, 1)));
+                if (rotate_inverse_z)
+                    obj.mesh.getTransforms().add(new Rotate(-2, new Point3D(0, 0, 1)));
+            }
+        };
+        movement.start();
     }
 }
 
@@ -132,6 +135,20 @@ class Object3D{
         all_objects.add(this);
         this.mesh = mesh;
     }
+    public Object3D(Shape3D mesh, double x, double y, double z){
+        all_objects.add(this);
+        mesh.translateXProperty().set(x);
+        mesh.translateYProperty().set(y);
+        mesh.translateZProperty().set(z);
+        this.mesh = mesh;
+    }
+
+    public void set_rotation(double x, double y, double z){
+        mesh.getTransforms().add(new Rotate(x, new Point3D(1, 0, 0)));
+        mesh.getTransforms().add(new Rotate(y, new Point3D(0, 1, 0)));
+        mesh.getTransforms().add(new Rotate(z, new Point3D(0, 0, 1)));
+    }
+
 
     // about display:
     // there is no integrated way in javafx to draw 3D shapes using canvas and graphical context

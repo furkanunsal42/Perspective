@@ -15,3 +15,7 @@ out/production/Perspective/Render2D$2.class
 out/production/Perspective/Render2D$3.class
 out/production/Perspective/Render2D.class
 out/production/Perspective/vertex.class
+*.class
+out/production/Perspective/Render3D$1.class
+out/production/Perspective/Render3D$2.class
+out/production/Perspective/Render3D.class

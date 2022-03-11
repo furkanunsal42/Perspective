@@ -46,17 +46,21 @@ public class Render3D extends Application{
         Object3D prism2 = new Object3D(new Box(800, 600, 1), 300, 300, 300);
         prism2.set_rotation(0, -45, 0);
 
+        // map
+        Map map = new Map();
+        map.world_objects.add(sphere);
+        map.world_objects.add(prism1);
+        map.world_objects.add(prism2);
+        map.update_object_group();
+
         // start movement system
-        initialize_movement_system(stage, prism2);
+        initialize_movement_system(stage, map);
 
         // display objects in the scene
-        root.getChildren().add(sphere.mesh);
-        root.getChildren().add(prism1.mesh);
-        root.getChildren().add(prism2.mesh);
-
+        root.getChildren().add(map.object_group);
     }
 
-    public void initialize_movement_system(Stage stage, Object3D obj){
+    public void initialize_movement_system(Stage stage, Map map){
         AnimationTimer movement = new AnimationTimer() {
             @Override
             public void handle(long l) {
@@ -95,29 +99,29 @@ public class Render3D extends Application{
                 });
 
                 if (move_x)
-                    obj.mesh.translateXProperty().set(obj.mesh.getTranslateX() - 10);
+                    map.object_group.translateXProperty().set(map.object_group.getTranslateX() - 10);
                 if (move_inverse_x)
-                    obj.mesh.translateXProperty().set(obj.mesh.getTranslateX() + 10);
+                    map.object_group.translateXProperty().set(map.object_group.getTranslateX() + 10);
                 if (move_y)
-                    obj.mesh.translateYProperty().set(obj.mesh.getTranslateY() - 10);
+                    map.object_group.translateYProperty().set(map.object_group.getTranslateY() - 10);
                 if (move_inverse_y)
-                    obj.mesh.translateYProperty().set(obj.mesh.getTranslateY() + 10);
+                    map.object_group.translateYProperty().set(map.object_group.getTranslateY() + 10);
                 if (move_z)
-                    obj.mesh.translateZProperty().set(obj.mesh.getTranslateZ() + 10);
+                    map.object_group.translateZProperty().set(map.object_group.getTranslateZ() + 10);
                 if (move_inverse_z)
-                    obj.mesh.translateZProperty().set(obj.mesh.getTranslateZ() - 10);
+                    map.object_group.translateZProperty().set(map.object_group.getTranslateZ() - 10);
                 if (rotate_x)
-                    obj.mesh.getTransforms().add(new Rotate(-2, new Point3D(1, 0, 0)));
+                    map.object_group.getTransforms().add(new Rotate(-2, new Point3D(1, 0, 0)));
                 if (rotate_inverse_x)
-                    obj.mesh.getTransforms().add(new Rotate(+2, new Point3D(1, 0, 0)));
+                    map.object_group.getTransforms().add(new Rotate(+2, new Point3D(1, 0, 0)));
                 if (rotate_y)
-                    obj.mesh.getTransforms().add(new Rotate(+2, new Point3D(0, 1, 0)));
+                    map.object_group.getTransforms().add(new Rotate(+2, new Point3D(0, 1, 0)));
                 if (rotate_inverse_y)
-                    obj.mesh.getTransforms().add(new Rotate(-2, new Point3D(0, 1, 0)));
+                    map.object_group.getTransforms().add(new Rotate(-2, new Point3D(0, 1, 0)));
                 if (rotate_z)
-                    obj.mesh.getTransforms().add(new Rotate(+2, new Point3D(0, 0, 1)));
+                    map.object_group.getTransforms().add(new Rotate(+2, new Point3D(0, 0, 1)));
                 if (rotate_inverse_z)
-                    obj.mesh.getTransforms().add(new Rotate(-2, new Point3D(0, 0, 1)));
+                    map.object_group.getTransforms().add(new Rotate(-2, new Point3D(0, 0, 1)));
             }
         };
         movement.start();
@@ -169,8 +173,8 @@ class Vertex3D{
 class Map{
     ArrayList<Object3D> world_objects = new ArrayList<>();
     Group object_group = new Group();
-    Vertex3D rotation;
-    Vertex3D position;
+    Vertex3D rotation = new Vertex3D(0, 0, 0);
+    Vertex3D position = new Vertex3D(0, 0, 0);
 
     public void update_object_group(){
         // recreate object_group from world_objects

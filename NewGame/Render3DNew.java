@@ -50,6 +50,8 @@ public class Render3DNew extends Application{
 
         // map
         Map map = new Map();
+
+        /*
         map.grid3D[0][0][0] = 1;
         map.grid3D[6][0][0] = 1;
         map.grid3D[0][6][0] = 1;
@@ -59,7 +61,16 @@ public class Render3DNew extends Application{
         map.grid3D[0][6][6] = 1;
         map.grid3D[6][6][6] = 1;
         map.grid3D[3][3][3] = 1;
+        */
 
+        // fill the entire 7x7x7 grid
+        map.add_box_to_grid(1, 0, 0, 0, 6, 6, 6);
+        // poke 5x7x5 hollow spaces from all three directions
+        map.add_box_to_grid(0, 1, 0, 1, 5, 6, 5);
+        map.add_box_to_grid(0, 1, 1, 0, 5, 5, 6);
+        map.add_box_to_grid(0, 0, 1, 1, 6, 5, 5);
+
+        // finish creating map
         map.update_object_group();
 
         // start movement system
@@ -256,7 +267,7 @@ class Map{
                 for (int z = 0; z < grid3D[x][y].length; z++){
                     int value = grid3D[x][y][z];
                     if (value == 1)
-                        all_world_objects.add(new Object3D(new Box(unit_cube_length, unit_cube_length, unit_cube_length), x*unit_cube_length, (grid3D[0].length-y)*unit_cube_length, z*unit_cube_length));
+                        all_world_objects.add(new Object3D(new Box(unit_cube_length, unit_cube_length, unit_cube_length), (grid3D.length-x)*unit_cube_length, (grid3D[0].length-y)*unit_cube_length, z*unit_cube_length));
                 }
             }
         }
@@ -275,6 +286,16 @@ class Map{
         object_group.translateXProperty().set(position.x);
         object_group.translateXProperty().set(position.y);
         object_group.translateXProperty().set(position.z);
+    }
+
+    void add_box_to_grid(int type, int x1, int y1, int z1, int x2, int y2, int z2){
+        for (int x = x1; x <= x2; x++){
+            for (int y = y1; y <= y2; y++){
+                for (int z = z1; z <= z2; z++){
+                    grid3D[x][y][z] = type;
+                }
+            }
+        }
     }
 
 }

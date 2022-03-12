@@ -47,25 +47,19 @@ public class Render3DNew extends Application{
     }
 
     public void create_world_1(Stage stage){
-        // objects
-        Object3D temp = new Object3D(new Sphere(50), 0, 0, 0);
-
-        Object3D bottom_platform = new Object3D(new Box(1000, 100, 1000), 0, 600, 300);
-
-        Object3D target = new Object3D(new Box(1000, 100, 100), 0, 300, 600);
-        target.set_rotation(0, 0, -15);
-
-        Slice slice_panel = new Slice(new Box(800, 600, 1), 300, 300, 300);
-        slice_panel.set_rotation(0, 90, 0);
-        slice_panel.set_transparency(.8);
 
         // map
         Map map = new Map();
+        map.grid3D[0][0][0] = 1;
+        map.grid3D[6][0][0] = 1;
+        map.grid3D[0][6][0] = 1;
+        map.grid3D[6][6][0] = 1;
+        map.grid3D[0][0][6] = 1;
+        map.grid3D[6][0][6] = 1;
+        map.grid3D[0][6][6] = 1;
+        map.grid3D[6][6][6] = 1;
+        map.grid3D[3][3][3] = 1;
 
-        map.all_world_objects.add(temp);
-        map.all_world_objects.add(bottom_platform);
-        map.all_world_objects.add(target);
-        map.slice = slice_panel;
         map.update_object_group();
 
         // start movement system
@@ -77,7 +71,6 @@ public class Render3DNew extends Application{
 
         // display objects in the scene
         root.getChildren().add(map.object_group);
-        root.getChildren().add(map.slice.mesh);
 
         // setup camera
         PerspectiveCamera camera = new PerspectiveCamera();
@@ -241,14 +234,33 @@ class Vertex3D{
 }
 
 class Map{
+    int[][][] grid3D;
+    double unit_cube_length = 100;
     ArrayList<Object3D> all_world_objects = new ArrayList<>();
-    Object3D slice;
+
+    public Map(){
+        grid3D = new int[7][7][7];
+    }
+    public Map(int grid_size){
+        grid3D = new int[grid_size][grid_size][grid_size];
+    }
 
     Group object_group = new Group();
     Vertex3D rotation = new Vertex3D(0, 0, 0);
     Vertex3D position = new Vertex3D(0, 0, 0);
 
     public void update_object_group(){
+        all_world_objects.clear();
+        for (int x = 0; x < grid3D.length; x++){
+            for (int y = 0; y < grid3D[x].length; y++){
+                for (int z = 0; z < grid3D[x][y].length; z++){
+                    int value = grid3D[x][y][z];
+                    if (value == 1)
+                        all_world_objects.add(new Object3D(new Box(unit_cube_length, unit_cube_length, unit_cube_length), x*unit_cube_length, (grid3D[0].length-y)*unit_cube_length, z*unit_cube_length));
+                }
+            }
+        }
+
         // recreate object_group from world_objects
         object_group.getChildren().clear();
         for (Object3D obj: all_world_objects) {

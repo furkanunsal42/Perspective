@@ -2,6 +2,7 @@ import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
+import javafx.scene.SceneAntialiasing;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.KeyEvent;
@@ -34,7 +35,7 @@ public class Render2D extends Application {
         Pane root = new Pane();
         Canvas canvas = new Canvas(800, 600);
         root.getChildren().add(canvas);
-        Scene scene = new Scene(root, 800, 600);
+        Scene scene = new Scene(root, 800, 600, true, SceneAntialiasing.BALANCED);
         primary_stage.setScene(scene);
 
         // create objects in map_1
@@ -223,7 +224,7 @@ class Object{
         for(int i = 0; i < input_vertices.length; i++)
             this.vertices[i] = input_vertices[i];
 
-        // once a object is created add it to all_object list
+        // once an object is created add it to all_object list
         all_objects.add(this);
     }
 
@@ -238,8 +239,8 @@ class Object{
     }
 
     public void escape_collision(Object colliding_object){
-        // teleports the object to nearest location that wouldn't cause a collusion
-        // this function isn't in its final state since actually player's definion of the class is used rather than this
+        // teleports the object to the nearest location that wouldn't cause a collusion
+        // this function isn't in its final state since actually player's definition of the class is used rather than this.
         // this function is not important for 2d game
 
         while(this.does_collide(colliding_object)){

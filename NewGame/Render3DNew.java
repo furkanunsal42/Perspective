@@ -1,3 +1,5 @@
+package NewGame;
+
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.geometry.Point3D;
@@ -16,7 +18,7 @@ import javafx.stage.Stage;
 import java.util.ArrayList;
 
 
-public class Render3D extends Application{
+public class Render3DNew extends Application{
     boolean move_x=false, move_inverse_x=false, move_y=false, move_inverse_y=false, move_z=false, move_inverse_z=false;
     boolean rotate_x=false, rotate_inverse_x=false, rotate_y=false, rotate_inverse_y=false, rotate_z=false, rotate_inverse_z=false;
     double movement_speed = 2;
@@ -56,7 +58,6 @@ public class Render3D extends Application{
         Slice slice_panel = new Slice(new Box(800, 600, 1), 300, 300, 300);
         slice_panel.set_rotation(0, 90, 0);
         slice_panel.set_transparency(.8);
-        slice_panel.calculate_mathematical_plane_equation();
 
         // map
         Map map = new Map();
@@ -208,21 +209,6 @@ class Slice extends Object3D{
         mesh.translateYProperty().set(y);
         mesh.translateZProperty().set(z);
         this.mesh = mesh;
-    }
-
-    public void calculate_mathematical_plane_equation(){
-        Vertex3D vertex1 = new Vertex3D(mesh.getTranslateX(), mesh.getTranslateY(), mesh.getTranslateZ());
-
-        Vertex3D vertex_center = new Vertex3D(mesh.getLayoutBounds().getCenterX(), mesh.getLayoutBounds().getCenterY(), mesh.getLayoutBounds().getCenterZ());
-        Vertex3D center_difference = vertex1.multiply(-1).add(vertex_center);   // center - first_corner
-
-        Vertex3D vertex2 = vertex1.add(center_difference.multiply(2));
-
-        System.out.println(mesh.getLayoutBounds());
-        System.out.println(mesh.getTransforms());
-        System.out.println(vertex_center);
-        System.out.println(vertex1);
-        System.out.println(vertex2);
     }
 
 }

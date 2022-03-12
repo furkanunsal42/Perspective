@@ -16,6 +16,7 @@ import javafx.scene.transform.Rotate;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 
 public class Render3DNew extends Application{
@@ -70,6 +71,14 @@ public class Render3DNew extends Application{
         map.add_box_to_grid(0, 1, 1, 0, 5, 5, 6);
         map.add_box_to_grid(0, 0, 1, 1, 6, 5, 5);
 
+        map.grid3D[0][2][2] = 1;
+        int[][] image_x = map.create_2d_image_by_x(1);
+        for(int[] y: image_x){
+            for(int x: y){
+                System.out.print(x + " ");
+            }
+            System.out.println();
+        }
         // finish creating map
         map.update_object_group();
 
@@ -298,5 +307,24 @@ class Map{
         }
     }
 
+    int[][] create_2d_image_by_x(int type){
+        int x_length = grid3D.length;
+        int y_length = grid3D[0].length;
+        int z_length = grid3D[0][0].length;
+        int[][] image = new int[y_length][z_length];
+
+        for (int z = 0; z < z_length; z++) {
+            for (int y = 0; y < y_length; y++) {
+                for (int x = 0; x < x_length; x++) {
+                    int value = grid3D[x][y][z];
+                    if (value == type) {
+                        image[y_length-1-y][z] = type;
+                        break;
+                    }
+                }
+            }
+        }
+        return image;
+    }
 }
 

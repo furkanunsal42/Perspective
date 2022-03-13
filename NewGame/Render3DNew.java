@@ -104,10 +104,6 @@ public class Render3DNew extends Application{
         camera.translateZProperty().set(-500);
         camera.getTransforms().add(new Rotate(-45, new Point3D(1, 1, 0)));
         scene.setCamera(camera);
-
-
-        Render2DNew.create_map(stage, map.create_2d_image_by_x(1));
-
     }
 
     public void initialize_movement_system(Stage stage, Map map){
@@ -125,6 +121,11 @@ public class Render3DNew extends Application{
                 case F -> rotate_inverse_x = true;
                 case Z -> rotate_y = true;
                 case X -> rotate_inverse_y = true;
+
+                case TAB -> {
+                    Render2DNew.create_map(stage, map.create_2d_image_by_x(1));
+                    close_all_timers();
+                }
             }
         });
 

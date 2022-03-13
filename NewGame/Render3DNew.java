@@ -23,6 +23,9 @@ public class Render3DNew extends Application{
     double movement_speed = 2;
     double rotation_speed = .5;
 
+    // to be able to close all timers attached to stage without having each of them in separate variables we have to store them in an array
+    static ArrayList<AnimationTimer> timers = new ArrayList<>();
+
     public static void main(String[] args){
         launch(args);
     }
@@ -70,6 +73,8 @@ public class Render3DNew extends Application{
         map.add_box_to_grid(0, 1, 1, 0, 5, 5, 6);
 
         map.grid3D[0][2][2] = 1;
+
+        /*
         int[][] image_x = map.create_2d_image_by_x(1);
         for(int[] y: image_x){
             for(int x: y){
@@ -77,6 +82,8 @@ public class Render3DNew extends Application{
             }
             System.out.println();
         }
+        */
+
         // finish creating map
         map.update_object_group();
 
@@ -97,46 +104,50 @@ public class Render3DNew extends Application{
         camera.translateZProperty().set(-500);
         camera.getTransforms().add(new Rotate(-45, new Point3D(1, 1, 0)));
         scene.setCamera(camera);
+
+
+        Render2DNew.create_map(stage, map.create_2d_image_by_x(1));
+
     }
 
     public void initialize_movement_system(Stage stage, Map map){
+        stage.getScene().setOnKeyPressed(event ->{
+            switch (event.getCode()) {
+                case W -> move_z = true;
+                case S -> move_inverse_z = true;
+                case A -> move_x = true;
+                case D -> move_inverse_x = true;
+                case SHIFT -> move_y = true;
+                case CONTROL -> move_inverse_y = true;
+                case E -> rotate_z = true;
+                case Q -> rotate_inverse_z = true;
+                case R -> rotate_x = true;
+                case F -> rotate_inverse_x = true;
+                case Z -> rotate_y = true;
+                case X -> rotate_inverse_y = true;
+            }
+        });
+
+        stage.getScene().setOnKeyReleased(event ->{
+            switch (event.getCode()) {
+                case W -> move_z = false;
+                case S -> move_inverse_z = false;
+                case A -> move_x = false;
+                case D -> move_inverse_x = false;
+                case SHIFT -> move_y = false;
+                case CONTROL -> move_inverse_y = false;
+                case E -> rotate_z = false;
+                case Q -> rotate_inverse_z = false;
+                case R -> rotate_x = false;
+                case F -> rotate_inverse_x = false;
+                case Z -> rotate_y = false;
+                case X -> rotate_inverse_y = false;
+            }
+        });
+
         AnimationTimer movement = new AnimationTimer() {
             @Override
             public void handle(long l) {
-                stage.addEventHandler(KeyEvent.KEY_PRESSED, event ->{
-                    switch (event.getCode()) {
-                        case W -> move_z = true;
-                        case S -> move_inverse_z = true;
-                        case A -> move_x = true;
-                        case D -> move_inverse_x = true;
-                        case SHIFT -> move_y = true;
-                        case CONTROL -> move_inverse_y = true;
-                        case E -> rotate_z = true;
-                        case Q -> rotate_inverse_z = true;
-                        case R -> rotate_x = true;
-                        case F -> rotate_inverse_x = true;
-                        case Z -> rotate_y = true;
-                        case X -> rotate_inverse_y = true;
-                    }
-                });
-
-                stage.addEventHandler(KeyEvent.KEY_RELEASED, event ->{
-                    switch (event.getCode()) {
-                        case W -> move_z = false;
-                        case S -> move_inverse_z = false;
-                        case A -> move_x = false;
-                        case D -> move_inverse_x = false;
-                        case SHIFT -> move_y = false;
-                        case CONTROL -> move_inverse_y = false;
-                        case E -> rotate_z = false;
-                        case Q -> rotate_inverse_z = false;
-                        case R -> rotate_x = false;
-                        case F -> rotate_inverse_x = false;
-                        case Z -> rotate_y = false;
-                        case X -> rotate_inverse_y = false;
-                    }
-                });
-
                 if (move_x)
                     map.object_group.translateXProperty().set(map.object_group.getTranslateX() - movement_speed);
                 if (move_inverse_x)
@@ -164,6 +175,13 @@ public class Render3DNew extends Application{
             }
         };
         movement.start();
+        timers.add(movement);
+    }
+
+    public void close_all_timers(){
+        for(AnimationTimer timer: timers){
+            timer.stop();
+        }
     }
 }
 

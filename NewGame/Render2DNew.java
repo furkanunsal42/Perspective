@@ -1,11 +1,13 @@
 package NewGame;
 
 import javafx.application.Application;
+import javafx.event.EventHandler;
 import javafx.geometry.Point3D;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.SceneAntialiasing;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.*;
 import javafx.scene.shape.Shape;
@@ -18,45 +20,50 @@ public class Render2DNew extends Application {
     // define boolean movement parameters (each direction has it's boolean so that we can have a smoother movement system)
     static boolean move_x = false, move_inverse_x = false, move_jump = false;
 
+    // to be able to remove all EventHandlers attached to stage without having each of them in separate variables we have to store them in an array
+    static ArrayList<EventHandler> event_handlers = new ArrayList<>();
+
     // define movement speed
     static int speed = 2;
     static int max_speed = 10;
 
+    static int HEIGHT = 600;
+    static int WIDTH = 800;
+
     // main method (launches start function)
-    public static void main(String[] args) {
-        launch(args);
-    }
+    public static void main(String[] args) {launch(args);}
 
     // start method (runs to initialize javafx graphics window)
     @Override
     public void start(Stage primary_stage) {
 
-        // create standard javafx window elements
-        Pane root = new Pane();
-        Canvas canvas = new Canvas(800, 600);
-        root.getChildren().add(canvas);
-        Scene scene = new Scene(root, 800, 600, true, SceneAntialiasing.BALANCED);
-        primary_stage.setScene(scene);
-
-        // create objects in map_1
-        create_map_1(primary_stage);
-
-        // open window
-        primary_stage.show();
+        // set standard javafx window elements
+        set_stage(primary_stage);
     }
 
-    static void create_map_1(Stage primary_stage) {
-        Map2D map = new Map2D(7);
-        map.unit_square_length = 20;
-        map.grid2D[0][0] = 1;
-        map.grid2D[6][6] = 1;
-        map.update_object_group();
-        map.set_unit_length_by_height(600);
+    private static void set_stage(Stage stage){
+        // create standard javafx window elements
+        Pane root = new Pane();
+        Canvas canvas = new Canvas(WIDTH, HEIGHT);
+        root.getChildren().add(canvas);
+        Scene scene = new Scene(root, WIDTH, HEIGHT, true, SceneAntialiasing.BALANCED);
+        stage.setScene(scene);
+        // open window
+        stage.show();
 
-        Pane root = (Pane)primary_stage.getScene().getRoot();
+    }
+
+    public static void create_map(Stage stage, int[][] map_grid) {
+        set_stage(stage);
+
+        Map2D map = new Map2D(7);
+        map.grid2D = map_grid;
+        map.update_object_group();
+        map.set_unit_length_by_height(HEIGHT);
+
+        Pane root = (Pane)stage.getScene().getRoot();
 
         root.getChildren().add(map.object_group);
-        // root.getChildren().add(new Rectangle(100, 100));
     }
 }
 

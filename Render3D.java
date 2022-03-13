@@ -1,3 +1,4 @@
+import NewGame.Render2DNew;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.geometry.Point3D;
@@ -33,6 +34,8 @@ public class Render3D extends Application{
 
         // create the first map
         create_world_1(primary_stage);
+
+
     }
 
     public void set_stage(Stage stage){

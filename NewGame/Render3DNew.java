@@ -14,9 +14,7 @@ import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.*;
 import javafx.scene.transform.Rotate;
 import javafx.stage.Stage;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 
 
 public class Render3DNew extends Application{
@@ -67,9 +65,9 @@ public class Render3DNew extends Application{
         // fill the entire 7x7x7 grid
         map.add_box_to_grid(1, 0, 0, 0, 6, 6, 6);
         // poke 5x7x5 hollow spaces from all three directions
+        map.add_box_to_grid(0, 0, 1, 1, 6, 5, 5);
         map.add_box_to_grid(0, 1, 0, 1, 5, 6, 5);
         map.add_box_to_grid(0, 1, 1, 0, 5, 5, 6);
-        map.add_box_to_grid(0, 0, 1, 1, 6, 5, 5);
 
         map.grid3D[0][2][2] = 1;
         int[][] image_x = map.create_2d_image_by_x(1);
@@ -152,17 +150,17 @@ public class Render3DNew extends Application{
                 if (move_inverse_z)
                     map.object_group.translateZProperty().set(map.object_group.getTranslateZ() - movement_speed);
                 if (rotate_x)
-                    map.object_group.getTransforms().add(new Rotate(- rotation_speed, new Point3D(1, 0, 0)));
+                    map.object_group.getTransforms().add(new Rotate(-rotation_speed, new Point3D(1, 0, 0)));
                 if (rotate_inverse_x)
-                    map.object_group.getTransforms().add(new Rotate(+ rotation_speed, new Point3D(1, 0, 0)));
+                    map.object_group.getTransforms().add(new Rotate(+rotation_speed, new Point3D(1, 0, 0)));
                 if (rotate_y)
-                    map.object_group.getTransforms().add(new Rotate(+ rotation_speed, new Point3D(0, 1, 0)));
+                    map.object_group.getTransforms().add(new Rotate(+rotation_speed, new Point3D(0, 1, 0)));
                 if (rotate_inverse_y)
-                    map.object_group.getTransforms().add(new Rotate(- rotation_speed, new Point3D(0, 1, 0)));
+                    map.object_group.getTransforms().add(new Rotate(-rotation_speed, new Point3D(0, 1, 0)));
                 if (rotate_z)
-                    map.object_group.getTransforms().add(new Rotate(+ rotation_speed, new Point3D(0, 0, 1)));
+                    map.object_group.getTransforms().add(new Rotate(+rotation_speed, new Point3D(0, 0, 1)));
                 if (rotate_inverse_z)
-                    map.object_group.getTransforms().add(new Rotate(- rotation_speed, new Point3D(0, 0, 1)));
+                    map.object_group.getTransforms().add(new Rotate(-rotation_speed, new Point3D(0, 0, 1)));
             }
         };
         movement.start();

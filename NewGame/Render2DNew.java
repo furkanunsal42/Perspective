@@ -7,8 +7,8 @@ import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.SceneAntialiasing;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
 import javafx.scene.shape.Shape;
 import javafx.scene.transform.Rotate;
@@ -64,6 +64,8 @@ public class Render2DNew extends Application {
         Pane root = (Pane)stage.getScene().getRoot();
 
         root.getChildren().add(map.object_group);
+
+        stage.getScene().setFill(Color.BLACK);
     }
 }
 
@@ -174,7 +176,7 @@ class Map2D{
             for (int y = 0; y < grid2D[x].length; y++){
                 int value = grid2D[x][y];
                 if (value == 1)
-                    all_world_objects.add(new Object2D(new Rectangle(unit_square_length, unit_square_length), (grid2D.length-1-x)*unit_square_length, (grid2D[0].length-1-y)*unit_square_length));
+                    all_world_objects.add(new Object2D(new Rectangle(unit_square_length, unit_square_length, Color.WHITE), (grid2D.length-1-x)*unit_square_length, (grid2D[0].length-1-y)*unit_square_length));
             }
         }
 

@@ -185,9 +185,9 @@ class Map2D{
         all_world_objects.clear();
         for (int x = 0; x < grid2D.length; x++){
             for (int y = 0; y < grid2D[x].length; y++){
-                int value = grid2D[x][y];
+                int value = grid2D[y][x];
                 if (value == 1)
-                    all_world_objects.add(new Object2D(new Rectangle(unit_square_length, unit_square_length, Color.WHITE), (grid2D.length-1-x)*unit_square_length, (grid2D[0].length-1-y)*unit_square_length));
+                    all_world_objects.add(new Object2D(new Rectangle(unit_square_length, unit_square_length, Color.WHITE), (x)*unit_square_length, (y)*unit_square_length));
 
             }
         }

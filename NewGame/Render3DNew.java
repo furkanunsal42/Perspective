@@ -375,6 +375,12 @@ class Map{
                 }
             }
         }
+        for(int[] a: image) {
+            for (int b : a) {
+                System.out.print(b + " ");
+            }
+            System.out.println();
+        }
         return image;
     }
 }

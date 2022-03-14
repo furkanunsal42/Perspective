@@ -34,8 +34,8 @@ public class Render3DNew extends Application{
 
     @Override
     public void start(Stage primary_stage){
-        System.out.println("use WASD to move the world");
-        System.out.println("use Q-E R-F Z-X to rotate the world");
+        System.out.println("use WASD to move the character");
+        System.out.println("use Q-E to rotate the world");
         System.out.println("use K-I-L to transition to 2D in the respective dimensions X Y Z");
         System.out.println("use TAB to come back to 3D from 2D");
 
@@ -61,38 +61,14 @@ public class Render3DNew extends Application{
         Map map = new Map();
         current_map = map;
 
-        /*
-        map.grid3D[0][0][0] = 1;
-        map.grid3D[6][0][0] = 1;
-        map.grid3D[0][6][0] = 1;
-        map.grid3D[6][6][0] = 1;
-        map.grid3D[0][0][6] = 1;
-        map.grid3D[6][0][6] = 1;
-        map.grid3D[0][6][6] = 1;
-        map.grid3D[6][6][6] = 1;
-        map.grid3D[3][3][3] = 1;
-        */
+        map.add_box_to_grid(1, 0, 2, 0, 6, 2, 3);
+        map.add_box_to_grid(1, 0, 2, 3, 6, 4, 3);
+        map.add_box_to_grid(1, 0, 4, 3, 6, 4, 6);
 
+        // player
+        map.grid3D[5][3][1] = 2;
 
-        // fill the entire 7x7x7 grid
-        map.add_box_to_grid(1, 0, 0, 0, 6, 6, 6);
-        // poke 5x7x5 hollow spaces from all three directions
-        map.add_box_to_grid(0, 0, 1, 1, 6, 5, 5);
-        map.add_box_to_grid(0, 1, 0, 1, 5, 6, 5);
-        map.add_box_to_grid(0, 1, 1, 0, 5, 5, 6);
-
-        map.grid3D[3][2][2] = 1;
-        map.grid3D[5][1][2] = 1;
-
-        /*
-        int[][] image_x = map.create_2d_image_by_x(1);
-        for(int[] y: image_x){
-            for(int x: y){
-                System.out.print(x + " ");
-            }
-            System.out.println();
-        }
-        */
+        map.grid3D[1][5][5] = 3;
 
         // finish creating map
         map.update_object_group();
@@ -136,18 +112,13 @@ public class Render3DNew extends Application{
     static public void initialize_movement_system(Stage stage, Map map){
         stage.getScene().setOnKeyPressed(event ->{
             switch (event.getCode()) {
-                case W -> move_z = true;
-                case S -> move_inverse_z = true;
-                case A -> move_x = true;
-                case D -> move_inverse_x = true;
-                case SHIFT -> move_y = true;
-                case CONTROL -> move_inverse_y = true;
-                case E -> rotate_z = true;
-                case Q -> rotate_inverse_z = true;
-                case R -> rotate_x = true;
-                case F -> rotate_inverse_x = true;
-                case Z -> rotate_y = true;
-                case X -> rotate_inverse_y = true;
+                case W -> map.move_player(new Vertex3D(0, 0, 1));
+                case S -> map.move_player(new Vertex3D(0, 0, -1));
+                case A -> map.move_player(new Vertex3D(1, 0, 0));
+                case D -> map.move_player(new Vertex3D(-1, 0, 0));
+
+                case E -> rotate_y = true;
+                case Q -> rotate_inverse_y = true;
 
                 case I -> {
                     Render2DNew.create_map(stage, map.create_2d_image(1, "y"));
@@ -166,18 +137,8 @@ public class Render3DNew extends Application{
 
         stage.getScene().setOnKeyReleased(event ->{
             switch (event.getCode()) {
-                case W -> move_z = false;
-                case S -> move_inverse_z = false;
-                case A -> move_x = false;
-                case D -> move_inverse_x = false;
-                case SHIFT -> move_y = false;
-                case CONTROL -> move_inverse_y = false;
-                case E -> rotate_z = false;
-                case Q -> rotate_inverse_z = false;
-                case R -> rotate_x = false;
-                case F -> rotate_inverse_x = false;
-                case Z -> rotate_y = false;
-                case X -> rotate_inverse_y = false;
+                case E -> rotate_y = false;
+                case Q -> rotate_inverse_y = false;
             }
         });
 
@@ -327,13 +288,21 @@ class Map{
             for (int y = 0; y < grid3D[x].length; y++){
                 for (int z = 0; z < grid3D[x][y].length; z++){
                     int value = grid3D[x][y][z];
-                    if (value == 1)
-                        all_world_objects.add(new Object3D(new Box(unit_cube_length, unit_cube_length, unit_cube_length), (grid3D.length-x)*unit_cube_length, (grid3D[0].length-y)*unit_cube_length, z*unit_cube_length));
+                    PhongMaterial material = new PhongMaterial();
+                    Box box = new Box(unit_cube_length, unit_cube_length, unit_cube_length);
+                    if (value == 1) {
+                        material.setDiffuseColor(Color.WHITE);
+                        box.setMaterial(material);
+                        all_world_objects.add(new Object3D(box, (grid3D.length - x) * unit_cube_length, (grid3D[0].length - y) * unit_cube_length, z * unit_cube_length));
 
-                    if (value == 2) {
-                        PhongMaterial material = new PhongMaterial();
-                        material.setDiffuseColor(Color.GREEN);
-                        Box box = new Box(unit_cube_length, unit_cube_length, unit_cube_length);
+                    }
+                    else if (value == 2) {
+                        material.setDiffuseColor(Color.DARKRED);
+                        box.setMaterial(material);
+                        all_world_objects.add(new Object3D(box, (grid3D.length - x) * unit_cube_length, (grid3D[0].length - y) * unit_cube_length, z * unit_cube_length));
+                    }
+                    else if (value == 3) {
+                        material.setDiffuseColor(Color.GOLD);
                         box.setMaterial(material);
                         all_world_objects.add(new Object3D(box, (grid3D.length - x) * unit_cube_length, (grid3D[0].length - y) * unit_cube_length, z * unit_cube_length));
                     }
@@ -378,21 +347,21 @@ class Map{
                             int x = k, y = j, z = i;
                             int value = grid3D[x][y][z];
                             if (value == type) {
-                                image[unit_length - 1 - y][z] = type;
+                                image[unit_length-1-y][z] = type;
                             }
                         }
                         case "y" -> {
                             int x = i, y = k, z = j;
                             int value = grid3D[x][y][z];
                             if (value == type) {
-                                image[unit_length - 1 - z][unit_length - 1 - x] = type;
+                                image[unit_length-1-z][unit_length-1-x] = type;
                             }
                         }
                         case "z" -> {
                             int x = i, y = j, z = k;
                             int value = grid3D[x][y][z];
                             if (value == type) {
-                                image[unit_length - 1 - y][unit_length - 1 - x] = type;
+                                image[unit_length-1-y][unit_length-1-x] = type;
                             }
                         }
                     }
@@ -408,6 +377,30 @@ class Map{
         }
         */
         return image;
+    }
+
+    public void move_player(Vertex3D direction){
+        ArrayList<Vertex3D> new_locations = new ArrayList<>();
+        for(int x = 0; x < grid3D.length; x++) {
+            for (int y = 0; y < grid3D.length; y++) {
+                for (int z = 0; z < grid3D.length; z++) {
+                    if (grid3D[x][y][z] == 2){
+                        if (direction.x + x < grid3D.length && direction.y + y < grid3D.length && direction.z + z < grid3D.length
+                                && direction.x + x >= 0 && direction.y + y >= 0  && direction.z + z >= 0){
+                            int new_x = (int)direction.x+x,new_y = (int)direction.y+y, new_z = (int)direction.z+z;
+                            if(grid3D[new_x][new_y][new_z] == 0) {
+                                grid3D[x][y][z] = 0;
+                                new_locations.add(new Vertex3D(new_x, new_y, new_z));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        for(Vertex3D location: new_locations){
+            grid3D[(int)location.x][(int)location.y][(int)location.z] = 2;
+        }
+        update_object_group();
     }
 }
 

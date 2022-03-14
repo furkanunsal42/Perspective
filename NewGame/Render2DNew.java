@@ -21,7 +21,6 @@ public class Render2DNew extends Application {
     static boolean move_x = false, move_inverse_x = false, move_jump = false;
 
     // to be able to remove all EventHandlers attached to stage without having each of them in separate variables we have to store them in an array
-    static ArrayList<EventHandler> event_handlers = new ArrayList<>();
 
     // define movement speed
     static int speed = 2;
@@ -61,11 +60,23 @@ public class Render2DNew extends Application {
         map.update_object_group();
         map.set_unit_length_by_height(HEIGHT);
 
+        initialize_movement_system(stage, map);
+
         Pane root = (Pane)stage.getScene().getRoot();
 
         root.getChildren().add(map.object_group);
 
         stage.getScene().setFill(Color.BLACK);
+    }
+
+    static void initialize_movement_system(Stage stage, Map2D map){
+        stage.getScene().setOnKeyPressed(event -> {
+            switch (event.getCode()){
+                case TAB -> {
+                    Render3DNew.return_to_current_map(stage);
+                }
+            }
+        });
     }
 }
 
@@ -177,6 +188,7 @@ class Map2D{
                 int value = grid2D[x][y];
                 if (value == 1)
                     all_world_objects.add(new Object2D(new Rectangle(unit_square_length, unit_square_length, Color.WHITE), (grid2D.length-1-x)*unit_square_length, (grid2D[0].length-1-y)*unit_square_length));
+
             }
         }
 

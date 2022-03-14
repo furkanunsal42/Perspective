@@ -18,10 +18,12 @@ import java.util.ArrayList;
 
 
 public class Render3DNew extends Application{
-    boolean move_x=false, move_inverse_x=false, move_y=false, move_inverse_y=false, move_z=false, move_inverse_z=false;
-    boolean rotate_x=false, rotate_inverse_x=false, rotate_y=false, rotate_inverse_y=false, rotate_z=false, rotate_inverse_z=false;
-    double movement_speed = 2;
-    double rotation_speed = .5;
+    static boolean move_x=false, move_inverse_x=false, move_y=false, move_inverse_y=false, move_z=false, move_inverse_z=false;
+    static boolean rotate_x=false, rotate_inverse_x=false, rotate_y=false, rotate_inverse_y=false, rotate_z=false, rotate_inverse_z=false;
+    static double movement_speed = 2;
+    static double rotation_speed = .5;
+
+    static Map current_map = new Map();
 
     // to be able to close all timers attached to stage without having each of them in separate variables we have to store them in an array
     static ArrayList<AnimationTimer> timers = new ArrayList<>();
@@ -39,7 +41,7 @@ public class Render3DNew extends Application{
         create_world_1(primary_stage);
     }
 
-    public void set_stage(Stage stage){
+    static public void set_stage(Stage stage){
         // standard javafx windows elements
         Pane root = new Pane();
         Scene scene = new Scene(root, 800, 600, true, SceneAntialiasing.BALANCED);
@@ -48,10 +50,11 @@ public class Render3DNew extends Application{
         stage.show();
     }
 
-    public void create_world_1(Stage stage){
+    static public void create_world_1(Stage stage){
 
         // map
         Map map = new Map();
+        current_map = map;
 
         /*
         map.grid3D[0][0][0] = 1;
@@ -65,6 +68,7 @@ public class Render3DNew extends Application{
         map.grid3D[3][3][3] = 1;
         */
 
+
         // fill the entire 7x7x7 grid
         map.add_box_to_grid(1, 0, 0, 0, 6, 6, 6);
         // poke 5x7x5 hollow spaces from all three directions
@@ -72,7 +76,8 @@ public class Render3DNew extends Application{
         map.add_box_to_grid(0, 1, 0, 1, 5, 6, 5);
         map.add_box_to_grid(0, 1, 1, 0, 5, 5, 6);
 
-        map.grid3D[0][2][2] = 1;
+        map.grid3D[3][2][2] = 1;
+        map.grid3D[5][1][2] = 1;
 
         /*
         int[][] image_x = map.create_2d_image_by_x(1);
@@ -106,7 +111,24 @@ public class Render3DNew extends Application{
         scene.setCamera(camera);
     }
 
-    public void initialize_movement_system(Stage stage, Map map){
+    static void return_to_current_map(Stage stage){
+        set_stage(stage);
+        Map map = current_map;
+        map.update_object_group();
+        initialize_movement_system(stage, map);
+        Scene scene = stage.getScene();
+        Pane root = (Pane)scene.getRoot();
+        root.getChildren().add(map.object_group);
+        PerspectiveCamera camera = new PerspectiveCamera();
+        camera.translateXProperty().set(500);
+        camera.translateYProperty().set(-500);
+        camera.translateZProperty().set(-500);
+        camera.getTransforms().add(new Rotate(-45, new Point3D(1, 1, 0)));
+        scene.setCamera(camera);
+    }
+
+
+    static public void initialize_movement_system(Stage stage, Map map){
         stage.getScene().setOnKeyPressed(event ->{
             switch (event.getCode()) {
                 case W -> move_z = true;
@@ -123,7 +145,7 @@ public class Render3DNew extends Application{
                 case X -> rotate_inverse_y = true;
 
                 case TAB -> {
-                    Render2DNew.create_map(stage, map.create_2d_image_by_x(1));
+                    Render2DNew.create_map(stage, map.create_2d_image(1, "x"));
                     close_all_timers();
                 }
             }
@@ -179,7 +201,7 @@ public class Render3DNew extends Application{
         timers.add(movement);
     }
 
-    public void close_all_timers(){
+    static public void close_all_timers(){
         for(AnimationTimer timer: timers){
             timer.stop();
         }
@@ -294,6 +316,14 @@ class Map{
                     int value = grid3D[x][y][z];
                     if (value == 1)
                         all_world_objects.add(new Object3D(new Box(unit_cube_length, unit_cube_length, unit_cube_length), (grid3D.length-x)*unit_cube_length, (grid3D[0].length-y)*unit_cube_length, z*unit_cube_length));
+
+                    if (value == 2) {
+                        PhongMaterial material = new PhongMaterial();
+                        material.setDiffuseColor(Color.GREEN);
+                        Box box = new Box(unit_cube_length, unit_cube_length, unit_cube_length);
+                        box.setMaterial(material);
+                        all_world_objects.add(new Object3D(box, (grid3D.length - x) * unit_cube_length, (grid3D[0].length - y) * unit_cube_length, z * unit_cube_length));
+                    }
                 }
             }
         }
@@ -324,7 +354,7 @@ class Map{
         }
     }
 
-    int[][] create_2d_image_by_x(int type){
+    int[][] create_2d_image(int type, String direction){
         int x_length = grid3D.length;
         int y_length = grid3D[0].length;
         int z_length = grid3D[0][0].length;
@@ -334,9 +364,13 @@ class Map{
             for (int y = 0; y < y_length; y++) {
                 for (int x = 0; x < x_length; x++) {
                     int value = grid3D[x][y][z];
-                    if (value == type) {
-                        image[y_length-1-y][z] = type;
-                        break;
+                    switch (direction){
+                        case "x": {
+                            if (value == type) {
+                                image[y_length - 1 - y][z] = type;
+                                break;
+                            }
+                        }
                     }
                 }
             }

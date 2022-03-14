@@ -17,10 +17,6 @@ import java.util.ArrayList;
 
 
 public class Render2DNew extends Application {
-    // define boolean movement parameters (each direction has it's boolean so that we can have a smoother movement system)
-    static boolean move_x = false, move_inverse_x = false, move_jump = false;
-
-    // to be able to remove all EventHandlers attached to stage without having each of them in separate variables we have to store them in an array
 
     // define movement speed
     static int speed = 2;
@@ -52,11 +48,12 @@ public class Render2DNew extends Application {
 
     }
 
-    public static void create_map(Stage stage, int[][] map_grid) {
+    public static void create_map(Stage stage, int[][] map_grid, boolean topdown) {
         set_stage(stage);
 
         Map2D map = new Map2D(7);
         map.grid2D = map_grid;
+        map.topdown = topdown;
         map.update_object_group();
         map.set_unit_length_by_height(HEIGHT);
 
@@ -131,44 +128,18 @@ class Object2D{
     }
 }
 
-// player
-/*
-class Player extends Object {
-    // Player class is a child class of Object
-    // one of the main differences of player is that it is a circle so, it is not defined as vertex but an arc path
-
-    // velocity vector is represented with a vertex
-    Vertex velocity = new Vertex(0, 0);
-
-    // location is represented with two double variables but IT SHOULD BECOME VERTEX AT SOME POINT
-    double center_x, center_y, radius;
-    Color color = Color.DARKRED;
-
-    boolean can_jump = false;
-
-    // it is possible to create a player with no parameters
-    public Player(){}
-
-    // it is possible to create a player with parameters
-    public Player(double x, double y, double radii){
-        this.center_x = x;
-        this.center_y = y;
-        this.radius = radii;
-    }
-
-    // update position based on velocity
-    public void apply_physics_movements(){
-        center_x += velocity.x;
-        center_y += velocity.y;
-    }
-}
-*/
-
 class Map2D{
     int[][] grid2D;
     ArrayList<Object2D> all_world_objects = new ArrayList<>();
     Group object_group = new Group();
     double unit_square_length = 100;
+
+    // weather the direction is in topdown direction(y) or side directions (x, z)
+    // topdown and side directions have different display and player movement mechanics
+    boolean topdown = true;
+
+    ArrayList<Vertex2D> player_positions = new ArrayList<>();
+
     Map2D(){
         grid2D = new int[7][7];
     }
@@ -182,22 +153,38 @@ class Map2D{
     }
 
     public void update_object_group(){
+
         all_world_objects.clear();
         for (int x = 0; x < grid2D.length; x++){
             for (int y = 0; y < grid2D[x].length; y++){
                 int value = grid2D[y][x];
                 if (value == 1)
                     all_world_objects.add(new Object2D(new Rectangle(unit_square_length, unit_square_length, Color.WHITE), (x)*unit_square_length, (y)*unit_square_length));
-
+                if (value == 2) {
+                    if (topdown)
+                        all_world_objects.add(new Object2D(new Rectangle(unit_square_length, unit_square_length, Color.WHITE), (x)*unit_square_length, (y)*unit_square_length));
+                    player_positions.add(new Vertex2D(x, y));
+                }
             }
+        }
+
+        // draw players
+        for(Vertex2D player_loc: player_positions){
+            int p_x = (int)player_loc.x, p_y = (int)player_loc.y;
+            Rectangle rect = new Rectangle(unit_square_length, unit_square_length, Color.DARKRED);
+            rect.setOpacity(0.7);
+            all_world_objects.add(new Object2D(rect, (p_x)*unit_square_length, (p_y)*unit_square_length));
         }
 
         object_group.getChildren().clear();
         for (Object2D obj: all_world_objects) {
             object_group.getChildren().add(obj.mesh);
         }
-
-
     }
+
+    public void player_move(Vertex2D direction){
+        
+    }
+
 
 }

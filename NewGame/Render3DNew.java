@@ -124,30 +124,29 @@ public class Render3DNew extends Application{
                 case Q -> rotate_inverse_y = true;
 
                 case K -> {
-                    Render2DNew.create_map(stage, map.create_2d_image(1, "y"));
+                    Render2DNew.create_map(stage, map.create_2d_image(1, "y"), true);
                     close_all_timers();
                 }
                 case J -> {
-                    Render2DNew.create_map(stage, map.create_2d_image(1, "x"));
+                    Render2DNew.create_map(stage, map.create_2d_image(1, "x"), false);
                     close_all_timers();
                 }
                 case L -> {
-                    Render2DNew.create_map(stage, map.create_2d_image(1, "z"));
+                    Render2DNew.create_map(stage, map.create_2d_image(1, "z"), false);
                     close_all_timers();
                 }
                 case Z -> {
-                    Render2DNew.create_map(stage, map.create_2d_image(1, "-x"));
+                    Render2DNew.create_map(stage, map.create_2d_image(1, "-x"), false);
                     close_all_timers();
                 }
                 case X -> {
-                    Render2DNew.create_map(stage, map.create_2d_image(1, "-y"));
+                    Render2DNew.create_map(stage, map.create_2d_image(1, "-y"), true);
                     close_all_timers();
                 }
                 case C -> {
-                    Render2DNew.create_map(stage, map.create_2d_image(1, "-z"));
+                    Render2DNew.create_map(stage, map.create_2d_image(1, "-z"), false);
                     close_all_timers();
                 }
-
             }
         });
 
@@ -364,59 +363,66 @@ class Map{
                         case "x" -> {
                             int x = k, y = j, z = i;
                             int value = grid3D[x][y][z];
-                            if (value == type) {
+                            if (value == type)
                                 image[unit_length-1-y][z] = type;
-                            }
+                            else if (value == 2)
+                                image[unit_length-1-y][z] = 2;
                         }
                         case "-x" ->{
                             int x = unit_length-1-k, y = j, z = k;
                             int value = grid3D[x][y][z];
-                            if (value == type) {
+                            if (value == type)
                                 image[y][z] = type;
-                            }
+                            else if (value == 2)
+                                image[unit_length-1-y][z] = 2;
+
                         }
                         case "y" -> {
                             int x = i, y = k, z = j;
                             int value = grid3D[x][y][z];
-                            if (value == type) {
+                            if (value == type)
                                 image[unit_length-1-z][unit_length-1-x] = type;
-                            }
+                            else if (value == 2)
+                                image[unit_length-1-y][z] = 2;
+
                         }
                         case "-y" -> {
                             int x = i, y = unit_length-1-k, z = j;
                             int value = grid3D[x][y][z];
-                            if (value == type) {
+                            if (value == type)
                                 image[z][x] = type;
-                            }
+                            else if (value == 2)
+                                image[unit_length-1-y][z] = 2;
                         }
 
                         case "z" -> {
                             int x = i, y = j, z = k;
                             int value = grid3D[x][y][z];
-                            if (value == type) {
+                            if (value == type)
                                 image[unit_length-1-y][unit_length-1-x] = type;
-                            }
+                            else if (value == 2)
+                                image[unit_length-1-y][z] = 2;
                         }
                         case "-z" -> {
                             int x = i, y = j, z = unit_length-1-k;
                             int value = grid3D[x][y][z];
-                            if (value == type) {
+                            if (value == type)
                                 image[y][x] = type;
-                            }
+                            else if (value == 2)
+                                image[unit_length-1-y][z] = 2;
                         }
-
                     }
                 }
             }
         }
-        /*
+
         for(int[] a: image) {
             for (int b : a) {
                 System.out.print(b + " ");
             }
             System.out.println();
         }
-        */
+
         return image;
     }
 

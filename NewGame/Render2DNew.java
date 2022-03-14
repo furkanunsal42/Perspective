@@ -72,6 +72,18 @@ public class Render2DNew extends Application {
                 case TAB -> {
                     Render3DNew.return_to_current_map(stage);
                 }
+                case W -> {
+                    map.player_move(new Vertex2D(0, -1));
+                }
+                case S -> {
+                    map.player_move(new Vertex2D(0, 1));
+                }
+                case A -> {
+                    map.player_move(new Vertex2D(-1, 0));
+                }
+                case D -> {
+                    map.player_move(new Vertex2D(1, 0));
+                }
             }
         });
     }
@@ -155,6 +167,8 @@ class Map2D{
     public void update_object_group(){
 
         all_world_objects.clear();
+        player_positions.clear();
+
         for (int x = 0; x < grid2D.length; x++){
             for (int y = 0; y < grid2D[x].length; y++){
                 int value = grid2D[y][x];
@@ -183,8 +197,39 @@ class Map2D{
     }
 
     public void player_move(Vertex2D direction){
+        if (!topdown && direction.y != 0)
+            return;
         
+        ArrayList<Vertex2D> new_locations = new ArrayList<>();
+        for(int x = 0; x < grid2D.length; x++) {
+            for (int y = 0; y < grid2D.length; y++) {
+                    if (grid2D[x][y] == 2){
+                        if (direction.x + y < grid2D.length && direction.y + x < grid2D.length
+                                && direction.x + y >= 0 && direction.y + x >= 0){
+
+                            // inverted purposely      y+x                         x+y
+                            int new_x = (int)direction.y+x, new_y = (int)direction.x+y;
+                            if (topdown) {
+                                if (grid2D[new_x][new_y] == 1) {
+                                    grid2D[x][y] = 1;
+                                    new_locations.add(new Vertex2D(new_x, new_y));
+                                }
+                            }
+                            else{
+                                if (grid2D[new_x][new_y] == 0) {
+                                    grid2D[x][y] = 0;
+                                    new_locations.add(new Vertex2D(new_x, new_y));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        for(Vertex2D location: new_locations){
+            grid2D[(int)location.x][(int)location.y] = 2;
+        }
+        update_object_group();
     }
-
-
 }
+
+

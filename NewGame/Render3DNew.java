@@ -65,9 +65,12 @@ public class Render3DNew extends Application{
         map.add_box_to_grid(1, 0, 2, 3, 6, 4, 3);
         map.add_box_to_grid(1, 0, 4, 3, 6, 4, 6);
 
-        // player
+
+        // type 2 is player
         map.grid3D[5][3][1] = 2;
+        // type 0 blank
         map.grid3D[4][4][6] = 0;
+        //type 3 is target
         map.grid3D[1][5][5] = 3;
 
         // finish creating map
@@ -189,6 +192,8 @@ public class Render3DNew extends Application{
     }
 
     static public void close_all_timers(){
+        move_x=false; move_inverse_x=false; move_y=false; move_inverse_y=false; move_z=false; move_inverse_z=false;
+        rotate_x=false; rotate_inverse_x=false; rotate_y=false; rotate_inverse_y=false; rotate_z=false; rotate_inverse_z=false;
         for(AnimationTimer timer: timers){
             timer.stop();
         }

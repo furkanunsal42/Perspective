@@ -199,7 +199,7 @@ class Map2D{
     public void player_move(Vertex2D direction){
         if (!topdown && direction.y != 0)
             return;
-        
+
         ArrayList<Vertex2D> new_locations = new ArrayList<>();
         for(int x = 0; x < grid2D.length; x++) {
             for (int y = 0; y < grid2D.length; y++) {

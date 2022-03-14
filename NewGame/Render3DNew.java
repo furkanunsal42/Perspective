@@ -34,6 +34,11 @@ public class Render3DNew extends Application{
 
     @Override
     public void start(Stage primary_stage){
+        System.out.println("use WASD to move the world");
+        System.out.println("use Q-E R-F Z-X to rotate the world");
+        System.out.println("use K-I-L to transition to 2D in the respective dimensions X Y Z");
+        System.out.println("use TAB to come back to 3D from 2D");
+
         // set standard javafx stage
         set_stage(primary_stage);
 
@@ -368,42 +373,40 @@ class Map{
         for (int i = 0; i < unit_length; i++) {
             for (int j = 0; j < unit_length; j++) {
                 for (int k = 0; k < unit_length; k++) {
-                    switch (direction){
-                        case "x": {
+                    switch (direction) {
+                        case "x" -> {
                             int x = k, y = j, z = i;
                             int value = grid3D[x][y][z];
                             if (value == type) {
-                                image[unit_length-1-y][z] = type;
+                                image[unit_length - 1 - y][z] = type;
                             }
-                            break;
                         }
-                        case "y": {
+                        case "y" -> {
                             int x = i, y = k, z = j;
                             int value = grid3D[x][y][z];
                             if (value == type) {
-                                image[unit_length-1-z][unit_length-1-x] = type;
+                                image[unit_length - 1 - z][unit_length - 1 - x] = type;
                             }
-                            break;
                         }
-                        case "z": {
+                        case "z" -> {
                             int x = i, y = j, z = k;
                             int value = grid3D[x][y][z];
                             if (value == type) {
-                                image[unit_length-1-y][unit_length-1-x] = type;
+                                image[unit_length - 1 - y][unit_length - 1 - x] = type;
                             }
-                            break;
                         }
-
                     }
                 }
             }
         }
+        /*
         for(int[] a: image) {
             for (int b : a) {
                 System.out.print(b + " ");
             }
             System.out.println();
         }
+        */
         return image;
     }
 }

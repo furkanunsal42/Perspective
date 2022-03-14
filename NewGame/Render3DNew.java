@@ -144,8 +144,16 @@ public class Render3DNew extends Application{
                 case Z -> rotate_y = true;
                 case X -> rotate_inverse_y = true;
 
-                case TAB -> {
+                case I -> {
+                    Render2DNew.create_map(stage, map.create_2d_image(1, "y"));
+                    close_all_timers();
+                }
+                case L -> {
                     Render2DNew.create_map(stage, map.create_2d_image(1, "x"));
+                    close_all_timers();
+                }
+                case K -> {
+                    Render2DNew.create_map(stage, map.create_2d_image(1, "z"));
                     close_all_timers();
                 }
             }
@@ -355,22 +363,37 @@ class Map{
     }
 
     int[][] create_2d_image(int type, String direction){
-        int x_length = grid3D.length;
-        int y_length = grid3D[0].length;
-        int z_length = grid3D[0][0].length;
-        int[][] image = new int[y_length][z_length];
-
-        for (int z = 0; z < z_length; z++) {
-            for (int y = 0; y < y_length; y++) {
-                for (int x = 0; x < x_length; x++) {
-                    int value = grid3D[x][y][z];
+        int unit_length = grid3D.length;
+        int[][] image = new int[unit_length][unit_length];
+        for (int i = 0; i < unit_length; i++) {
+            for (int j = 0; j < unit_length; j++) {
+                for (int k = 0; k < unit_length; k++) {
                     switch (direction){
                         case "x": {
+                            int x = k, y = j, z = i;
+                            int value = grid3D[x][y][z];
                             if (value == type) {
-                                image[y_length - 1 - y][z] = type;
-                                break;
+                                image[unit_length-1-y][z] = type;
                             }
+                            break;
                         }
+                        case "y": {
+                            int x = i, y = k, z = j;
+                            int value = grid3D[x][y][z];
+                            if (value == type) {
+                                image[unit_length-1-z][unit_length-1-x] = type;
+                            }
+                            break;
+                        }
+                        case "z": {
+                            int x = i, y = j, z = k;
+                            int value = grid3D[x][y][z];
+                            if (value == type) {
+                                image[unit_length-1-y][unit_length-1-x] = type;
+                            }
+                            break;
+                        }
+
                     }
                 }
             }

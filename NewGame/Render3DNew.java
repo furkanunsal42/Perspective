@@ -67,7 +67,7 @@ public class Render3DNew extends Application{
 
         // player
         map.grid3D[5][3][1] = 2;
-
+        map.grid3D[4][4][6] = 0;
         map.grid3D[1][5][5] = 3;
 
         // finish creating map
@@ -120,18 +120,31 @@ public class Render3DNew extends Application{
                 case E -> rotate_y = true;
                 case Q -> rotate_inverse_y = true;
 
-                case I -> {
+                case K -> {
                     Render2DNew.create_map(stage, map.create_2d_image(1, "y"));
                     close_all_timers();
                 }
-                case L -> {
+                case J -> {
                     Render2DNew.create_map(stage, map.create_2d_image(1, "x"));
                     close_all_timers();
                 }
-                case K -> {
+                case L -> {
                     Render2DNew.create_map(stage, map.create_2d_image(1, "z"));
                     close_all_timers();
                 }
+                case Z -> {
+                    Render2DNew.create_map(stage, map.create_2d_image(1, "-x"));
+                    close_all_timers();
+                }
+                case X -> {
+                    Render2DNew.create_map(stage, map.create_2d_image(1, "-y"));
+                    close_all_timers();
+                }
+                case C -> {
+                    Render2DNew.create_map(stage, map.create_2d_image(1, "-z"));
+                    close_all_timers();
+                }
+
             }
         });
 
@@ -350,6 +363,13 @@ class Map{
                                 image[unit_length-1-y][z] = type;
                             }
                         }
+                        case "-x" ->{
+                            int x = unit_length-1-k, y = j, z = k;
+                            int value = grid3D[x][y][z];
+                            if (value == type) {
+                                image[y][z] = type;
+                            }
+                        }
                         case "y" -> {
                             int x = i, y = k, z = j;
                             int value = grid3D[x][y][z];
@@ -357,6 +377,14 @@ class Map{
                                 image[unit_length-1-z][unit_length-1-x] = type;
                             }
                         }
+                        case "-y" -> {
+                            int x = i, y = unit_length-1-k, z = j;
+                            int value = grid3D[x][y][z];
+                            if (value == type) {
+                                image[z][x] = type;
+                            }
+                        }
+
                         case "z" -> {
                             int x = i, y = j, z = k;
                             int value = grid3D[x][y][z];
@@ -364,6 +392,14 @@ class Map{
                                 image[unit_length-1-y][unit_length-1-x] = type;
                             }
                         }
+                        case "-z" -> {
+                            int x = i, y = j, z = unit_length-1-k;
+                            int value = grid3D[x][y][z];
+                            if (value == type) {
+                                image[y][x] = type;
+                            }
+                        }
+
                     }
                 }
             }

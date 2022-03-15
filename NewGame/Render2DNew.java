@@ -197,9 +197,10 @@ class Map2D{
     }
 
     public void player_move(Vertex2D direction){
-        if (!topdown && direction.y != 0)
+        if (!topdown && direction.y != 0) {
             return;
-
+        }
+        // warning: this code is a spaghetti, x and y should be inverted.
         ArrayList<Vertex2D> new_locations = new ArrayList<>();
         for(int x = 0; x < grid2D.length; x++) {
             for (int y = 0; y < grid2D.length; y++) {
@@ -218,7 +219,14 @@ class Map2D{
                             else{
                                 if (grid2D[new_x][new_y] == 0) {
                                     grid2D[x][y] = 0;
-                                    new_locations.add(new Vertex2D(new_x, new_y));
+                                    int below_y = new_x+1;
+                                    if (below_y >= 0 && below_y < grid2D.length) {
+                                        if (grid2D[below_y][new_y] != 0)
+                                            new_locations.add(new Vertex2D(new_x, new_y));
+                                        else
+                                            new_locations.add((new Vertex2D(x, y)));
+
+                                    }
                                 }
                             }
                         }

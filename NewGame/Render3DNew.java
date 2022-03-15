@@ -69,9 +69,9 @@ public class Render3DNew extends Application{
         // type 2 is player
         map.grid3D[5][3][1] = 2;
         // type 0 blank
-        map.grid3D[4][4][6] = 0;
+        // map.grid3D[4][4][6] = 0;
         //type 3 is target
-        map.grid3D[1][5][5] = 3;
+        // map.grid3D[1][5][5] = 3;
 
         // finish creating map
         map.update_object_group();
@@ -438,6 +438,7 @@ class Map{
             }
         }
 
+        System.out.println("-------- image creation below -----------");
         for(int[] a: image) {
             for (int b : a) {
                 System.out.print(b + " ");
@@ -475,12 +476,26 @@ class Map{
     void reposition_player_from_image(int[][] image){
 
         ArrayList<Vertex2D> player_positions_2D = new ArrayList<>();
+
+        System.out.println("-------- image reading below -----------");
+        for(int x = 0; x < image.length; x++) {
+            for (int y = 0; y < image.length; y++) {
+                System.out.print(image[x][y] + " ");
+            }
+            System.out.println();
+        }
+
         for (int x = 0; x < image.length; x++){
             for (int y = 0; y < image.length; y++){
-                if (image[y][x] == 2)
-                    player_positions_2D.add(new Vertex2D(x, y));
+                if (image[x][y] == 2)
+                    player_positions_2D.add(new Vertex2D(y, x));
             }
         }
+
+        for(Vertex2D pos: player_positions_2D){
+            System.out.println(pos.x + " " + pos.y);
+        }
+
         ArrayList<Vertex3D> player_positions_3D = new ArrayList<>();
         int unit_length = grid3D.length;
 
@@ -496,10 +511,10 @@ class Map{
         for(Vertex2D player_position: player_positions_2D) {
             for (int i = 0; i < unit_length; i++) {
                 if (direction.equals("x")) {
-                    int x = unit_length - 1 - i, y = (int)player_position.y, z = (int)player_position.x;
+                    int x = i, y = unit_length-1-(int)player_position.y, z = (int)player_position.x;
                     int value = grid3D[x][y][z];
-                    if (y - 1 > 0) {
-                        int below_value = grid3D[x][y - 1][z];
+                    if (y-1 > 0 && y-1 < unit_length) {
+                        int below_value = grid3D[x][y-1][z];
                         if (value == 0 && below_value == 1) {
                             player_positions_3D.add(new Vertex3D(x, y, z));
                             break;
@@ -516,7 +531,7 @@ class Map{
                         }
                     }
                 } else if (direction.equals("z")) {
-                    int x = (int)player_position.x, y = (int)player_position.y, z = i;
+                    int x = unit_length-1-(int)player_position.x, y = unit_length-1-(int)player_position.y, z = i;
                     int value = grid3D[x][y][z];
                     if (y - 1 > 0) {
                         int below_value = grid3D[x][y - 1][z];
@@ -526,7 +541,7 @@ class Map{
                         }
                     }
                 } else if (direction.equals("-x")) {
-                    int x = i, y = (int)player_position.y, z = (int)player_position.x;
+                    int x = unit_length-1-i, y = unit_length-1-(int)player_position.y, z = unit_length-1-(int)player_position.x;
                     int value = grid3D[x][y][z];
                     if (y - 1 > 0) {
                         int below_value = grid3D[x][y - 1][z];

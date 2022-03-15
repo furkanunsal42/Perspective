@@ -95,9 +95,10 @@ public class Render3DNew extends Application{
         scene.setCamera(camera);
     }
 
-    static void return_to_current_map(Stage stage){
+    static void return_to_current_map(Stage stage, int[][] image){
         set_stage(stage);
         Map map = current_map;
+        map.reposition_player_from_image(image);
         map.update_object_group();
         initialize_movement_system(stage, map);
         Scene scene = stage.getScene();
@@ -287,6 +288,7 @@ class Map{
     int[][][] grid3D;
     double unit_cube_length = 100;
     ArrayList<Object3D> all_world_objects = new ArrayList<>();
+    String direction = "";
 
     public Map(){
         grid3D = new int[7][7][7];
@@ -354,6 +356,7 @@ class Map{
     }
 
     int[][] create_2d_image(int type, String direction){
+        this.direction = direction;
         int unit_length = grid3D.length;
         int[][] image = new int[unit_length][unit_length];
         for (int i = 0; i < unit_length; i++) {
@@ -465,6 +468,98 @@ class Map{
         }
         for(Vertex3D location: new_locations){
             grid3D[(int)location.x][(int)location.y][(int)location.z] = 2;
+        }
+        update_object_group();
+    }
+
+    void reposition_player_from_image(int[][] image){
+
+        ArrayList<Vertex2D> player_positions_2D = new ArrayList<>();
+        for (int x = 0; x < image.length; x++){
+            for (int y = 0; y < image.length; y++){
+                if (image[y][x] == 2)
+                    player_positions_2D.add(new Vertex2D(x, y));
+            }
+        }
+        ArrayList<Vertex3D> player_positions_3D = new ArrayList<>();
+        int unit_length = grid3D.length;
+
+        for (int x = 0; x < unit_length; x++) {
+            for (int y = 0; y < unit_length; y++) {
+                for (int z = 0; z < unit_length; z++) {
+                    if (grid3D[x][y][z] == 2)
+                        grid3D[x][y][z] = 0;
+                }
+            }
+        }
+
+        for(Vertex2D player_position: player_positions_2D) {
+            for (int i = 0; i < unit_length; i++) {
+                if (direction.equals("x")) {
+                    int x = unit_length - 1 - i, y = (int)player_position.y, z = (int)player_position.x;
+                    int value = grid3D[x][y][z];
+                    if (y - 1 > 0) {
+                        int below_value = grid3D[x][y - 1][z];
+                        if (value == 0 && below_value == 1) {
+                            player_positions_3D.add(new Vertex3D(x, y, z));
+                            break;
+                        }
+                    }
+                } else if (direction.equals("y")) {
+                    int x = unit_length-1-(int)player_position.x, y = unit_length - 1 - i, z = unit_length-1-(int)player_position.y;
+                    int value = grid3D[x][y][z];
+                    if (y - 1 > 0) {
+                        int below_value = grid3D[x][y - 1][z];
+                        if (value == 0 && below_value == 1) {
+                            player_positions_3D.add(new Vertex3D(x, y, z));
+                            break;
+                        }
+                    }
+                } else if (direction.equals("z")) {
+                    int x = (int)player_position.x, y = (int)player_position.y, z = i;
+                    int value = grid3D[x][y][z];
+                    if (y - 1 > 0) {
+                        int below_value = grid3D[x][y - 1][z];
+                        if (value == 0 && below_value == 1) {
+                            player_positions_3D.add(new Vertex3D(x, y, z));
+                            break;
+                        }
+                    }
+                } else if (direction.equals("-x")) {
+                    int x = i, y = (int)player_position.y, z = (int)player_position.x;
+                    int value = grid3D[x][y][z];
+                    if (y - 1 > 0) {
+                        int below_value = grid3D[x][y - 1][z];
+                        if (value == 0 && below_value == 1) {
+                            player_positions_3D.add(new Vertex3D(x, y, z));
+                            break;
+                        }
+                    }
+                } else if (direction.equals("-y")) {
+                    int x = (int)player_position.x, y = i, z = (int)player_position.y;
+                    int value = grid3D[x][y][z];
+                    if (y - 1 > 0) {
+                        int below_value = grid3D[x][y - 1][z];
+                        if (value == 0 && below_value == 1) {
+                            player_positions_3D.add(new Vertex3D(x, y, z));
+                            break;
+                        }
+                    }
+                } else if (direction.equals("-z")) {
+                    int x = (int)player_position.x, y = (int)player_position.y, z = unit_length - 1 - i;
+                    int value = grid3D[x][y][z];
+                    if (y - 1 > 0) {
+                        int below_value = grid3D[x][y - 1][z];
+                        if (value == 0 && below_value == 1) {
+                            player_positions_3D.add(new Vertex3D(x, y, z));
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        for (Vertex3D p_position: player_positions_3D){
+            grid3D[(int)p_position.x][(int)p_position.y][(int)p_position.z] = 2;
         }
         update_object_group();
     }

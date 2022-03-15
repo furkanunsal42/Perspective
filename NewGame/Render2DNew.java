@@ -70,7 +70,7 @@ public class Render2DNew extends Application {
         stage.getScene().setOnKeyPressed(event -> {
             switch (event.getCode()){
                 case TAB -> {
-                    Render3DNew.return_to_current_map(stage);
+                    Render3DNew.return_to_current_map(stage, map.grid2D);
                 }
                 case W -> {
                     map.player_move(new Vertex2D(0, -1));

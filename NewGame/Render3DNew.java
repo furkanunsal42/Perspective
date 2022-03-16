@@ -15,6 +15,8 @@ import javafx.scene.shape.*;
 import javafx.scene.transform.Rotate;
 import javafx.stage.Stage;
 import java.util.ArrayList;
+import javafx.scene.image.Image;
+
 
 
 public class Render3DNew extends Application{
@@ -32,7 +34,7 @@ public class Render3DNew extends Application{
         launch(args);
     }
 
-    @Override
+
     public void start(Stage primary_stage){
         System.out.println("use WASD to move the character");
         System.out.println("use Q-E to rotate the world");
@@ -48,6 +50,9 @@ public class Render3DNew extends Application{
 
     static public void set_stage(Stage stage){
         // standard javafx windows elements
+        Image logo=new Image("file:logo.jpg");
+        stage.getIcons().add(logo);
+        stage.setTitle("Perspective");
         Pane root = new Pane();
         Scene scene = new Scene(root, 800, 600, true, SceneAntialiasing.BALANCED);
         scene.setFill(Color.BLACK);

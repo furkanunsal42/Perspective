@@ -1,22 +1,21 @@
 package NewGame;
 
+import com.sun.scenario.animation.shared.ClipEnvelope;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.geometry.Point3D;
-import javafx.scene.Group;
-import javafx.scene.PerspectiveCamera;
-import javafx.scene.SceneAntialiasing;
+import javafx.scene.*;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
-import javafx.scene.Scene;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.*;
 import javafx.scene.transform.Rotate;
+import javafx.scene.transform.Translate;
 import javafx.stage.Stage;
 import java.util.ArrayList;
 import javafx.scene.image.Image;
-
+import javafx.stage.StageStyle;
 
 
 public class Render3DNew extends Application{
@@ -267,58 +266,60 @@ class Object3D{
     }
 }
 
-class Slice extends Object3D{
-    public Slice(Shape3D mesh){
-        all_objects.add(this);
-        this.mesh = mesh;
-        PhongMaterial material = new PhongMaterial();
-        material.setDiffuseColor(new Color(1, 1, 1, .1));
-        this.mesh.setMaterial(material);
+class Slice{
+    SubScene sub_scene;
+    public Slice(SubScene sub_scene){
+        this.sub_scene = sub_scene;
+        this.sub_scene.setOpacity(0.3);
         transform_according_to_direction("x");
+        sub_scene.setFill(Color.WHITE);
     }
     public void transform_according_to_direction(String direction){
         int offset = 100;
-        this.mesh.getTransforms().clear();
+        double length  = sub_scene.getBoundsInLocal().getWidth();
+        this.sub_scene.getTransforms().clear();
         switch (direction){
             case "x" -> {
-                this.mesh.translateXProperty().set(750 + offset);
-                this.mesh.translateYProperty().set(400);
-                this.mesh.translateZProperty().set(300);
-                this.mesh.getTransforms().add(new Rotate(90, new Point3D(0, 1, 0)));
+                this.sub_scene.translateXProperty().set(length + 50 + offset);
+                this.sub_scene.translateYProperty().set(50);
+                this.sub_scene.translateZProperty().set(length-50);
+                this.sub_scene.getTransforms().add(new Rotate(90, new Point3D(0, 1, 0)));
             }
             case "y" -> {
-                this.mesh.translateXProperty().set(400);
-                this.mesh.translateYProperty().set(+50 - offset);
-                this.mesh.translateZProperty().set(300);
-                this.mesh.getTransforms().add(new Rotate(90, new Point3D(1, 0, 0)));
+                this.sub_scene.translateXProperty().set(50);
+                this.sub_scene.translateYProperty().set(50 - offset);
+                this.sub_scene.translateZProperty().set(-50);
+                this.sub_scene.getTransforms().add(new Rotate(90, new Point3D(1, 0, 0)));
             }
             case "z" -> {
-                this.mesh.translateXProperty().set(400);
-                this.mesh.translateYProperty().set(400);
-                this.mesh.translateZProperty().set(-50 - offset);
-                this.mesh.getTransforms().add(new Rotate(0, new Point3D(0, 1, 0)));
+                this.sub_scene.translateXProperty().set(50);
+                this.sub_scene.translateYProperty().set(50);
+                this.sub_scene.translateZProperty().set(-50 - offset);
+                this.sub_scene.getTransforms().add(new Rotate(0, new Point3D(0, 1, 0)));
             }
             case "-x" -> {
-                this.mesh.translateXProperty().set(50 - offset);
-                this.mesh.translateYProperty().set(400);
-                this.mesh.translateZProperty().set(300);
-                this.mesh.getTransforms().add(new Rotate(-90, new Point3D(0, 1, 0)));
+                this.sub_scene.translateXProperty().set(50 - offset);
+                this.sub_scene.translateYProperty().set(50);
+                this.sub_scene.translateZProperty().set(-50);
+                this.sub_scene.getTransforms().add(new Rotate(-90, new Point3D(0, 1, 0)));
             }
             case "-y" -> {
-                this.mesh.translateXProperty().set(400);
-                this.mesh.translateYProperty().set(+750 + offset);
-                this.mesh.translateZProperty().set(300);
-                this.mesh.getTransforms().add(new Rotate(-90, new Point3D(1, 0, 0)));
+                this.sub_scene.translateXProperty().set(50);
+                this.sub_scene.translateYProperty().set(length + 50 + offset);
+                this.sub_scene.translateZProperty().set(length - 50);
+                this.sub_scene.getTransforms().add(new Rotate(-90, new Point3D(1, 0, 0)));
             }
             case "-z" -> {
-                this.mesh.translateXProperty().set(400);
-                this.mesh.translateYProperty().set(400);
-                this.mesh.translateZProperty().set(650 + offset);
-                this.mesh.getTransforms().add(new Rotate(180, new Point3D(0, 1, 0)));
+                this.sub_scene.translateXProperty().set(length + 50);
+                this.sub_scene.translateYProperty().set(50);
+                this.sub_scene.translateZProperty().set(length - 50 + offset);
+                this.sub_scene.getTransforms().add(new Rotate(180, new Point3D(0, 1, 0)));
             }
         }
     }
 
+    public void set_sub_scene(SubScene sub_scene){
+    }
 }
 
 class Vertex3D{
@@ -352,16 +353,18 @@ class Map{
     int[][][] grid3D;
     double unit_cube_length = 100;
     ArrayList<Object3D> all_world_objects = new ArrayList<>();
-    Slice panel = new Slice(new Box(700, 700, 0.3));
+    Slice panel;
     //Slice panel = new Slice(new Box(Render3DNew.screen_width, Render3DNew.screen_height, 0.3));
     //Slice panel = new Slice(new Box(10, 10, 10));
     String direction = "x";
 
     public Map(){
         grid3D = new int[7][7][7];
+        panel = new Slice(new SubScene(new Pane(), 7 * unit_cube_length, 7* unit_cube_length, true, SceneAntialiasing.BALANCED));
     }
     public Map(int grid_size){
         grid3D = new int[grid_size][grid_size][grid_size];
+        panel = new Slice(new SubScene(new Pane(), grid_size * unit_cube_length, grid_size * unit_cube_length, true, SceneAntialiasing.BALANCED));
     }
 
     Group object_group = new Group();
@@ -401,7 +404,7 @@ class Map{
         for (Object3D obj: all_world_objects) {
             object_group.getChildren().add(obj.mesh);
         }
-        object_group.getChildren().add(panel.mesh);
+        object_group.getChildren().add(panel.sub_scene);
 
         // apply rotation to group
         object_group.getTransforms().add(new Rotate(rotation.x, new Point3D(1, 0, 0)));

@@ -3,6 +3,7 @@ package NewGame;
 import com.sun.scenario.animation.shared.ClipEnvelope;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
+import javafx.collections.ObservableList;
 import javafx.geometry.Point3D;
 import javafx.scene.*;
 import javafx.scene.input.KeyEvent;
@@ -11,6 +12,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.*;
 import javafx.scene.transform.Rotate;
+import javafx.scene.transform.Transform;
 import javafx.scene.transform.Translate;
 import javafx.stage.Stage;
 import java.util.ArrayList;
@@ -79,6 +81,8 @@ public class Render3DNew extends Application{
         map.add_box_to_grid(1, 0, 2, 0, 6, 2, 3);
         map.add_box_to_grid(1, 0, 2, 3, 6, 4, 3);
         map.add_box_to_grid(1, 0, 4, 3, 6, 4, 6);
+
+        // map.add_box_to_grid(3, 0, 0, 0, 6, 6, 6);
 
         // type 2 is player
         map.grid3D[5][3][1] = 2;
@@ -150,25 +154,21 @@ public class Render3DNew extends Application{
                     direction_matrix_index_y -= 1;
                     direction_matrix_index_y = Math.floorMod(direction_matrix_index_y, 4);
                     map.direction = direction_choosing_matrix[direction_matrix_index_y][direction_matrix_index_x];
-                    map.panel.transform_according_to_direction(map.direction);
                 }
                 case DOWN -> {
                     direction_matrix_index_y += 1;
                     direction_matrix_index_y = Math.floorMod(direction_matrix_index_y, 4);
                     map.direction = direction_choosing_matrix[direction_matrix_index_y][direction_matrix_index_x];
-                    map.panel.transform_according_to_direction(map.direction);
                 }
                 case LEFT -> {
                     direction_matrix_index_x -= 1;
                     direction_matrix_index_x = Math.floorMod(direction_matrix_index_x, 4);
                     map.direction = direction_choosing_matrix[direction_matrix_index_y][direction_matrix_index_x];
-                    map.panel.transform_according_to_direction(map.direction);
                 }
                 case RIGHT -> {
                     direction_matrix_index_x += 1;
                     direction_matrix_index_x = Math.floorMod(direction_matrix_index_x, 4);
                     map.direction = direction_choosing_matrix[direction_matrix_index_y][direction_matrix_index_x];
-                    map.panel.transform_according_to_direction(map.direction);
                 }
                 case TAB-> {
                     boolean topdown = map.direction.equals("y") || map.direction.equals("-y");
@@ -176,6 +176,11 @@ public class Render3DNew extends Application{
                     close_all_timers();
                 }
             }
+            int[][] image = map.create_2d_image(1, map.direction);
+            map.panel.sub_scene = Render2DNew.create_panel_view(image, 700);
+            map.update_object_group();
+            map.panel.transform_according_to_direction(map.direction);
+
         });
 
         stage.getScene().setOnKeyReleased(event ->{
@@ -282,14 +287,14 @@ class Slice{
             case "x" -> {
                 this.sub_scene.translateXProperty().set(length + 50 + offset);
                 this.sub_scene.translateYProperty().set(50);
-                this.sub_scene.translateZProperty().set(length-50);
-                this.sub_scene.getTransforms().add(new Rotate(90, new Point3D(0, 1, 0)));
+                this.sub_scene.translateZProperty().set(-50);
+                this.sub_scene.getTransforms().add(new Rotate(-90, new Point3D(0, 1, 0)));
             }
             case "y" -> {
                 this.sub_scene.translateXProperty().set(50);
                 this.sub_scene.translateYProperty().set(50 - offset);
-                this.sub_scene.translateZProperty().set(-50);
-                this.sub_scene.getTransforms().add(new Rotate(90, new Point3D(1, 0, 0)));
+                this.sub_scene.translateZProperty().set(length-50);
+                this.sub_scene.getTransforms().add(new Rotate(-90, new Point3D(1, 0, 0)));
             }
             case "z" -> {
                 this.sub_scene.translateXProperty().set(50);
@@ -300,14 +305,14 @@ class Slice{
             case "-x" -> {
                 this.sub_scene.translateXProperty().set(50 - offset);
                 this.sub_scene.translateYProperty().set(50);
-                this.sub_scene.translateZProperty().set(-50);
-                this.sub_scene.getTransforms().add(new Rotate(-90, new Point3D(0, 1, 0)));
+                this.sub_scene.translateZProperty().set(length-50);
+                this.sub_scene.getTransforms().add(new Rotate(90, new Point3D(0, 1, 0)));
             }
             case "-y" -> {
                 this.sub_scene.translateXProperty().set(50);
                 this.sub_scene.translateYProperty().set(length + 50 + offset);
-                this.sub_scene.translateZProperty().set(length - 50);
-                this.sub_scene.getTransforms().add(new Rotate(-90, new Point3D(1, 0, 0)));
+                this.sub_scene.translateZProperty().set(-50);
+                this.sub_scene.getTransforms().add(new Rotate(90, new Point3D(1, 0, 0)));
             }
             case "-z" -> {
                 this.sub_scene.translateXProperty().set(length + 50);
@@ -316,9 +321,6 @@ class Slice{
                 this.sub_scene.getTransforms().add(new Rotate(180, new Point3D(0, 1, 0)));
             }
         }
-    }
-
-    public void set_sub_scene(SubScene sub_scene){
     }
 }
 

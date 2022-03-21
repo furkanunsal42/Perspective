@@ -1,23 +1,38 @@
+Menu
+No plans yet
+(maybe a tree like view for level selection)
+
+Sound
+No plans yet
+
+level designer
+no plans yet
+
+
+
+
 3D
-- 3d graphics 								                        work in progress
-- rotating the world 							                    work in progress
-- displaying the 2d world in slice 					                not started
-- transition to 2d animation						                not started
+- 3d graphics 								                        done needs improvement later
+- rotating the world 							                    done needs improvement later
+- displaying the 2d world in slice 					                work in progress
+- transition to 2d animation						                work in progress
+- movement in 3d                                                    done
 
 
 2D
-- character movement system						                    done needs improvements later
+- character movement system						                    done
 - collision with walls							                    done
-- gravity								                            done needs improvements later
-- saving the player when stuck inside a wall 				        done
-- 2d graphics 								                        done needs improvements later
-- different types of walls (different intersections with player)	not started
+- 2d graphics 								                        done needs improvement later
+- different types of cubes  (different intersections with player)	work in progress
+
 
 
 3D-2D
-- finding the collision points of 3d objects with the slice		    not started
+3d to 2d grid flattening                                            done
+2d to 3d player position calculation                                done
+cancel transition if player isn't shown on the map                  work in progress
 
 
-Bug reports: (if you find a bug please report it here with a good description of why or when it happens)
-
-no known bugs
+Known bugs: (if you find a bug please report it here with a good description of why or when it happens)
+- player disappears when transitioned into a direction where player cannot be seen      not started
+- player can fly while moving in 3d world                                               not started

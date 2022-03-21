@@ -6,6 +6,7 @@ import javafx.geometry.Point3D;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.SceneAntialiasing;
+import javafx.scene.SubScene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -51,7 +52,7 @@ public class Render2DNew extends Application {
     public static void create_map(Stage stage, int[][] map_grid, boolean topdown) {
         set_stage(stage);
 
-        Map2D map = new Map2D(7);
+        Map2D map = new Map2D(map_grid.length);
         map.grid2D = map_grid;
         map.topdown = topdown;
         map.update_object_group();
@@ -64,6 +65,21 @@ public class Render2DNew extends Application {
         root.getChildren().add(map.object_group);
 
         stage.getScene().setFill(Color.BLACK);
+    }
+
+    public static SubScene create_panel_view(int[][] map_grid, int view_length){
+
+        Map2D map = new Map2D(map_grid.length);
+        map.grid2D = map_grid;
+        //map.topdown = topdown;
+        map.update_object_group();
+        map.set_unit_length_by_height(view_length);
+
+        Pane root = new Pane();
+        root.getChildren().add(map.object_group);
+        SubScene sub_scene = new SubScene(root, view_length, view_length);
+        sub_scene.setOpacity(0.6);
+        return sub_scene;
     }
 
     static void initialize_movement_system(Stage stage, Map2D map){

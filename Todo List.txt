@@ -24,14 +24,13 @@ maybe
 - displaying the 2d world in slice 					                done
 - transition to 2d animation						                work in progress
 - movement in 3d                                                    done
-
+- transition between levels                                         done
 
 2D
 - character movement system						                    done
 - collision with walls							                    done
 - 2d graphics 								                        done needs improvement later
 - different types of cubes  (different intersections with player)	work in progress
-
 
 
 3D-2D

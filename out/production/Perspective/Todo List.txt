@@ -8,13 +8,20 @@ No plans yet
 level designer
 no plans yet
 
+level solver algorithm
+not started
 
+automatic level creation algorithm
+maybe
+
+community level creation marketplace and highscores
+maybe
 
 
 3D
 - 3d graphics 								                        done needs improvement later
 - rotating the world 							                    done needs improvement later
-- displaying the 2d world in slice 					                work in progress
+- displaying the 2d world in slice 					                done
 - transition to 2d animation						                work in progress
 - movement in 3d                                                    done
 

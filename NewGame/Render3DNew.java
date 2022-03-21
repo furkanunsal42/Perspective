@@ -1,23 +1,17 @@
 package NewGame;
 
-import com.sun.scenario.animation.shared.ClipEnvelope;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
-import javafx.collections.ObservableList;
 import javafx.geometry.Point3D;
 import javafx.scene.*;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.*;
 import javafx.scene.transform.Rotate;
-import javafx.scene.transform.Transform;
-import javafx.scene.transform.Translate;
 import javafx.stage.Stage;
 import java.util.ArrayList;
 import javafx.scene.image.Image;
-import javafx.stage.StageStyle;
 
 
 public class Render3DNew extends Application{
@@ -32,12 +26,14 @@ public class Render3DNew extends Application{
             new String[] {"-y", "-y", "-y", "-y"}};
     static int direction_matrix_index_x = 1;
     static int direction_matrix_index_y = 2;
-
+    static Stage stage;
     static int screen_height = 600;
     static int screen_width = 800;
 
 
     static Map current_map = new Map();
+
+    static int level_number = 1;
 
     // to be able to close all timers attached to stage without having each of them in separate variables we have to store them in an array
     static ArrayList<AnimationTimer> timers = new ArrayList<>();
@@ -52,15 +48,13 @@ public class Render3DNew extends Application{
         System.out.println("use Q-E to rotate the world");
         System.out.println("use arrows to choose direction");
         System.out.println("use TAB to alter between 3D from 2D");
-
-        // set standard javafx stage
-        set_stage(primary_stage);
+        stage = primary_stage;
 
         // create the first map
         create_world_1(primary_stage);
     }
 
-    static public void set_stage(Stage stage){
+    static public void set_stage(){
         // standard javafx windows elements
         Image logo=new Image("file:logo.jpg");
         stage.getIcons().add(logo);
@@ -72,7 +66,65 @@ public class Render3DNew extends Application{
         stage.show();
     }
 
+    static public void create_world_by_number(int number){
+        switch (number){
+            case 1 -> create_world_1(stage);
+            case 2 -> create_world_2(stage);
+        }
+    }
+
     static public void create_world_1(Stage stage){
+        // stop all timers from previous level
+        set_stage();
+        close_all_timers();
+
+        // map
+        Map map = new Map();
+        current_map = map;
+
+        map.add_box_to_grid(1, 0, 2, 0, 6, 2, 6);
+
+        // map.add_box_to_grid(3, 0, 0, 0, 6, 6, 6);
+
+        // type 2 is player
+        map.grid3D[5][3][1] = 2;
+        // type 0 blank
+        // map.grid3D[4][4][6] = 0;
+        //type 3 is target
+        map.grid3D[1][3][5] = 3;
+
+        // finish creating map
+        map.update_object_group();
+
+        // start movement system
+        initialize_movement_system(stage, map);
+
+        // access to scene and root
+        Scene scene = stage.getScene();
+        Pane root = (Pane)scene.getRoot();
+
+        // display objects in the scene
+        root.getChildren().add(map.object_group);
+
+        // panel initial position
+        int[][] image = map.create_2d_image(1, map.direction);
+        map.panel.sub_scene = Render2DNew.create_panel_view(image, 700);
+        map.update_object_group();
+        map.panel.transform_according_to_direction(map.direction);
+
+        // setup camera
+        PerspectiveCamera camera = new PerspectiveCamera();
+        camera.translateXProperty().set(500);
+        camera.translateYProperty().set(-500);
+        camera.translateZProperty().set(-500);
+        camera.getTransforms().add(new Rotate(-45, new Point3D(1, 1, 0)));
+        scene.setCamera(camera);
+    }
+
+    static public void create_world_2(Stage stage){
+        // stop all timers from previous level
+        set_stage();
+        close_all_timers();
 
         // map
         Map map = new Map();
@@ -81,8 +133,6 @@ public class Render3DNew extends Application{
         map.add_box_to_grid(1, 0, 2, 0, 6, 2, 3);
         map.add_box_to_grid(1, 0, 2, 3, 6, 4, 3);
         map.add_box_to_grid(1, 0, 4, 3, 6, 4, 6);
-
-        // map.add_box_to_grid(3, 0, 0, 0, 6, 6, 6);
 
         // type 2 is player
         map.grid3D[5][3][1] = 2;
@@ -104,6 +154,12 @@ public class Render3DNew extends Application{
         // display objects in the scene
         root.getChildren().add(map.object_group);
 
+        // panel initial position
+        int[][] image = map.create_2d_image(1, map.direction);
+        map.panel.sub_scene = Render2DNew.create_panel_view(image, 700);
+        map.update_object_group();
+        map.panel.transform_according_to_direction(map.direction);
+
         // setup camera
         PerspectiveCamera camera = new PerspectiveCamera();
         camera.translateXProperty().set(500);
@@ -114,7 +170,7 @@ public class Render3DNew extends Application{
     }
 
     static void return_to_current_map(Stage stage, int[][] image){
-        set_stage(stage);
+        set_stage();
         Map map = current_map;
         map.reposition_player_from_image(image);
         map.update_object_group();
@@ -161,14 +217,18 @@ public class Render3DNew extends Application{
                     map.direction = direction_choosing_matrix[direction_matrix_index_y][direction_matrix_index_x];
                 }
                 case LEFT -> {
-                    direction_matrix_index_x -= 1;
-                    direction_matrix_index_x = Math.floorMod(direction_matrix_index_x, 4);
-                    map.direction = direction_choosing_matrix[direction_matrix_index_y][direction_matrix_index_x];
+                    if(direction_matrix_index_y != 1 && direction_matrix_index_y != 3) {
+                        direction_matrix_index_x -= 1;
+                        direction_matrix_index_x = Math.floorMod(direction_matrix_index_x, 4);
+                        map.direction = direction_choosing_matrix[direction_matrix_index_y][direction_matrix_index_x];
+                    }
                 }
                 case RIGHT -> {
-                    direction_matrix_index_x += 1;
-                    direction_matrix_index_x = Math.floorMod(direction_matrix_index_x, 4);
-                    map.direction = direction_choosing_matrix[direction_matrix_index_y][direction_matrix_index_x];
+                    if(direction_matrix_index_y != 1 && direction_matrix_index_y != 3) {
+                        direction_matrix_index_x += 1;
+                        direction_matrix_index_x = Math.floorMod(direction_matrix_index_x, 4);
+                        map.direction = direction_choosing_matrix[direction_matrix_index_y][direction_matrix_index_x];
+                    }
                 }
                 case TAB-> {
                     boolean topdown = map.direction.equals("y") || map.direction.equals("-y");
@@ -276,7 +336,6 @@ class Slice{
     public Slice(SubScene sub_scene){
         this.sub_scene = sub_scene;
         this.sub_scene.setOpacity(0.3);
-        transform_according_to_direction("x");
         sub_scene.setFill(Color.WHITE);
     }
     public void transform_according_to_direction(String direction){
@@ -417,6 +476,40 @@ class Map{
         object_group.translateXProperty().set(position.x);
         object_group.translateXProperty().set(position.y);
         object_group.translateXProperty().set(position.z);
+
+        // check if level ended
+        for(int x = 0; x < grid3D.length; x++){
+            for(int y = 0; y < grid3D.length; y++){
+                for(int z = 0; z < grid3D.length; z++){
+                    if(grid3D[x][y][z] == 2) {
+                        if (x+1 < grid3D.length && grid3D[x+1][y][z] == 3){
+                            Render3DNew.level_number += 1;
+                            Render3DNew.create_world_by_number(Render3DNew.level_number);
+                        }
+                        else if (x-1 >= 0 && grid3D[x-1][y][z] == 3){
+                            Render3DNew.level_number += 1;
+                            Render3DNew.create_world_by_number(Render3DNew.level_number);
+                        }
+                        if (y+1 < grid3D.length && grid3D[x][y+1][z] == 3){
+                            Render3DNew.level_number += 1;
+                            Render3DNew.create_world_by_number(Render3DNew.level_number);
+                        }
+                        else if (y-1 >= 0 && grid3D[x][y-1][z] == 3){
+                            Render3DNew.level_number += 1;
+                            Render3DNew.create_world_by_number(Render3DNew.level_number);
+                        }
+                        if (z+1 < grid3D.length && grid3D[x][y][z+1] == 3){
+                            Render3DNew.level_number += 1;
+                            Render3DNew.create_world_by_number(Render3DNew.level_number);
+                        }
+                        else if (z-1 >= 0 && grid3D[x][y][z-1] == 3){
+                            Render3DNew.level_number += 1;
+                            Render3DNew.create_world_by_number(Render3DNew.level_number);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     void add_box_to_grid(int type, int x1, int y1, int z1, int x2, int y2, int z2){

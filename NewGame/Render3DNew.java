@@ -24,6 +24,17 @@ public class Render3DNew extends Application{
     static boolean rotate_x=false, rotate_inverse_x=false, rotate_y=false, rotate_inverse_y=false, rotate_z=false, rotate_inverse_z=false;
     static double movement_speed = 2;
     static double rotation_speed = .5;
+    final static String[][] direction_choosing_matrix = new String[][]{
+            new String[] {"-z", "-x", "z", "x"},
+            new String[] {"y", "y", "y", "y"},
+            new String[] {"z", "x", "-z", "-x"},
+            new String[] {"-y", "-y", "-y", "-y"}};
+    static int direction_matrix_index_x = 1;
+    static int direction_matrix_index_y = 2;
+
+    static int screen_height = 600;
+    static int screen_width = 800;
+
 
     static Map current_map = new Map();
 
@@ -38,8 +49,8 @@ public class Render3DNew extends Application{
     public void start(Stage primary_stage){
         System.out.println("use WASD to move the character");
         System.out.println("use Q-E to rotate the world");
-        System.out.println("use K-I-L to transition to 2D in the respective dimensions X Y Z");
-        System.out.println("use TAB to come back to 3D from 2D");
+        System.out.println("use arrows to choose direction");
+        System.out.println("use TAB to alter between 3D from 2D");
 
         // set standard javafx stage
         set_stage(primary_stage);
@@ -70,13 +81,12 @@ public class Render3DNew extends Application{
         map.add_box_to_grid(1, 0, 2, 3, 6, 4, 3);
         map.add_box_to_grid(1, 0, 4, 3, 6, 4, 6);
 
-
         // type 2 is player
         map.grid3D[5][3][1] = 2;
         // type 0 blank
         // map.grid3D[4][4][6] = 0;
         //type 3 is target
-        // map.grid3D[1][5][5] = 3;
+        map.grid3D[1][5][5] = 3;
 
         // finish creating map
         map.update_object_group();
@@ -119,6 +129,14 @@ public class Render3DNew extends Application{
 
 
     static public void initialize_movement_system(Stage stage, Map map){
+        /*
+        direction choosing matrix
+        -z  -x   z   x  up
+         y   y   y   y  ^
+         z   x  -z  -x  |
+        -y  -y  -y  -y  down
+        left --> right
+        */
         stage.getScene().setOnKeyPressed(event ->{
             switch (event.getCode()) {
                 case W -> map.move_player(new Vertex3D(0, 0, 1));
@@ -129,28 +147,33 @@ public class Render3DNew extends Application{
                 case E -> rotate_y = true;
                 case Q -> rotate_inverse_y = true;
 
-                case J -> {
-                    Render2DNew.create_map(stage, map.create_2d_image(1, "x"), false);
-                    close_all_timers();
+                case UP -> {
+                    direction_matrix_index_y -= 1;
+                    direction_matrix_index_y = Math.floorMod(direction_matrix_index_y, 4);
+                    map.direction = direction_choosing_matrix[direction_matrix_index_y][direction_matrix_index_x];
+                    map.panel.transform_according_to_direction(map.direction);
                 }
-                case K -> {
-                    Render2DNew.create_map(stage, map.create_2d_image(1, "y"), true);
-                    close_all_timers();
+                case DOWN -> {
+                    direction_matrix_index_y += 1;
+                    direction_matrix_index_y = Math.floorMod(direction_matrix_index_y, 4);
+                    map.direction = direction_choosing_matrix[direction_matrix_index_y][direction_matrix_index_x];
+                    map.panel.transform_according_to_direction(map.direction);
                 }
-                case L -> {
-                    Render2DNew.create_map(stage, map.create_2d_image(1, "z"), false);
-                    close_all_timers();
+                case LEFT -> {
+                    direction_matrix_index_x -= 1;
+                    direction_matrix_index_x = Math.floorMod(direction_matrix_index_x, 4);
+                    map.direction = direction_choosing_matrix[direction_matrix_index_y][direction_matrix_index_x];
+                    map.panel.transform_according_to_direction(map.direction);
                 }
-                case Z -> {
-                    Render2DNew.create_map(stage, map.create_2d_image(1, "-x"), false);
-                    close_all_timers();
+                case RIGHT -> {
+                    direction_matrix_index_x += 1;
+                    direction_matrix_index_x = Math.floorMod(direction_matrix_index_x, 4);
+                    map.direction = direction_choosing_matrix[direction_matrix_index_y][direction_matrix_index_x];
+                    map.panel.transform_according_to_direction(map.direction);
                 }
-                case X -> {
-                    Render2DNew.create_map(stage, map.create_2d_image(1, "-y"), true);
-                    close_all_timers();
-                }
-                case C -> {
-                    Render2DNew.create_map(stage, map.create_2d_image(1, "-z"), false);
+                case TAB-> {
+                    boolean topdown = map.direction.equals("y") || map.direction.equals("-y");
+                    Render2DNew.create_map(stage, map.create_2d_image(1, map.direction), topdown);
                     close_all_timers();
                 }
             }
@@ -245,19 +268,55 @@ class Object3D{
 }
 
 class Slice extends Object3D{
-    public Slice(){
-        all_objects.add(this);
-    }
     public Slice(Shape3D mesh){
         all_objects.add(this);
         this.mesh = mesh;
+        PhongMaterial material = new PhongMaterial();
+        material.setDiffuseColor(new Color(1, 1, 1, .1));
+        this.mesh.setMaterial(material);
+        transform_according_to_direction("x");
     }
-    public Slice(Shape3D mesh, double x, double y, double z){
-        all_objects.add(this);
-        mesh.translateXProperty().set(x);
-        mesh.translateYProperty().set(y);
-        mesh.translateZProperty().set(z);
-        this.mesh = mesh;
+    public void transform_according_to_direction(String direction){
+        int offset = 100;
+        this.mesh.getTransforms().clear();
+        switch (direction){
+            case "x" -> {
+                this.mesh.translateXProperty().set(750 + offset);
+                this.mesh.translateYProperty().set(400);
+                this.mesh.translateZProperty().set(300);
+                this.mesh.getTransforms().add(new Rotate(90, new Point3D(0, 1, 0)));
+            }
+            case "y" -> {
+                this.mesh.translateXProperty().set(400);
+                this.mesh.translateYProperty().set(+50 - offset);
+                this.mesh.translateZProperty().set(300);
+                this.mesh.getTransforms().add(new Rotate(90, new Point3D(1, 0, 0)));
+            }
+            case "z" -> {
+                this.mesh.translateXProperty().set(400);
+                this.mesh.translateYProperty().set(400);
+                this.mesh.translateZProperty().set(-50 - offset);
+                this.mesh.getTransforms().add(new Rotate(0, new Point3D(0, 1, 0)));
+            }
+            case "-x" -> {
+                this.mesh.translateXProperty().set(50 - offset);
+                this.mesh.translateYProperty().set(400);
+                this.mesh.translateZProperty().set(300);
+                this.mesh.getTransforms().add(new Rotate(-90, new Point3D(0, 1, 0)));
+            }
+            case "-y" -> {
+                this.mesh.translateXProperty().set(400);
+                this.mesh.translateYProperty().set(+750 + offset);
+                this.mesh.translateZProperty().set(300);
+                this.mesh.getTransforms().add(new Rotate(-90, new Point3D(1, 0, 0)));
+            }
+            case "-z" -> {
+                this.mesh.translateXProperty().set(400);
+                this.mesh.translateYProperty().set(400);
+                this.mesh.translateZProperty().set(650 + offset);
+                this.mesh.getTransforms().add(new Rotate(180, new Point3D(0, 1, 0)));
+            }
+        }
     }
 
 }
@@ -293,7 +352,10 @@ class Map{
     int[][][] grid3D;
     double unit_cube_length = 100;
     ArrayList<Object3D> all_world_objects = new ArrayList<>();
-    String direction = "";
+    Slice panel = new Slice(new Box(700, 700, 0.3));
+    //Slice panel = new Slice(new Box(Render3DNew.screen_width, Render3DNew.screen_height, 0.3));
+    //Slice panel = new Slice(new Box(10, 10, 10));
+    String direction = "x";
 
     public Map(){
         grid3D = new int[7][7][7];
@@ -339,6 +401,8 @@ class Map{
         for (Object3D obj: all_world_objects) {
             object_group.getChildren().add(obj.mesh);
         }
+        object_group.getChildren().add(panel.mesh);
+
         // apply rotation to group
         object_group.getTransforms().add(new Rotate(rotation.x, new Point3D(1, 0, 0)));
         object_group.getTransforms().add(new Rotate(rotation.y, new Point3D(0, 1, 0)));
@@ -443,14 +507,6 @@ class Map{
             }
         }
 
-        System.out.println("-------- image creation below -----------");
-        for(int[] a: image) {
-            for (int b : a) {
-                System.out.print(b + " ");
-            }
-            System.out.println();
-        }
-
         return image;
     }
 
@@ -482,23 +538,11 @@ class Map{
 
         ArrayList<Vertex2D> player_positions_2D = new ArrayList<>();
 
-        System.out.println("-------- image reading below -----------");
-        for(int x = 0; x < image.length; x++) {
-            for (int y = 0; y < image.length; y++) {
-                System.out.print(image[x][y] + " ");
-            }
-            System.out.println();
-        }
-
         for (int x = 0; x < image.length; x++){
             for (int y = 0; y < image.length; y++){
                 if (image[x][y] == 2)
                     player_positions_2D.add(new Vertex2D(y, x));
             }
-        }
-
-        for(Vertex2D pos: player_positions_2D){
-            System.out.println(pos.x + " " + pos.y);
         }
 
         ArrayList<Vertex3D> player_positions_3D = new ArrayList<>();

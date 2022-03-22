@@ -9,7 +9,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.*;
 import javafx.scene.transform.Rotate;
-import javafx.scene.transform.Transform;
 import javafx.stage.Stage;
 import java.util.ArrayList;
 import javafx.scene.image.Image;
@@ -83,6 +82,10 @@ public class Render3DNew extends Application{
         Map map = new Map();
         current_map = map;
 
+        // disable panel
+        map.panel_enable = false;
+
+
         map.add_box_to_grid(1, 0, 2, 0, 6, 2, 6);
 
         // map.add_box_to_grid(3, 0, 0, 0, 6, 6, 6);
@@ -98,7 +101,7 @@ public class Render3DNew extends Application{
         map.update_object_group();
 
         // start movement system
-        initialize_movement_system(stage, map);
+        initialize_movement_system(stage, map, "block_panel_display");
 
         // access to scene and root
         Scene scene = stage.getScene();
@@ -147,7 +150,7 @@ public class Render3DNew extends Application{
         map.update_object_group();
 
         // start movement system
-        initialize_movement_system(stage, map);
+        initialize_movement_system(stage, map, "block_panel_movement");
 
         // access to scene and root
         Scene scene = stage.getScene();
@@ -196,15 +199,25 @@ public class Render3DNew extends Application{
     }
 
 
-    static public void initialize_movement_system(Stage stage, Map map){
+    static public void initialize_movement_system(Stage stage, Map map, String... arguments){
+        boolean panel_movement = true, panel_display = true;
+        for(String argument: arguments){
+            if(argument.equals("block_panel_movement"))
+                panel_movement = false;
+            if(argument.equals("block_panel_display"))
+                panel_movement = false;
+        }
+
         /*
         direction choosing matrix
-        -z  -x   z   x  up
-         y   y   y   y  ^
-         z   x  -z  -x  |
-        -y  -y  -y  -y  down
-        left --> right
+        -z  -x   z   x
+         y   y   y   y
+         z   x  -z  -x
+        -y  -y  -y  -y
         */
+
+        // effectively final variables are necessary to use them locally in lambda expression
+        boolean finalPanel_movement = panel_movement;
         stage.getScene().setOnKeyPressed(event ->{
             switch (event.getCode()) {
                 case W -> map.move_player(new Vertex3D(0, 0, 1));
@@ -216,16 +229,22 @@ public class Render3DNew extends Application{
                 case Q -> rotate_inverse_y = true;
 
                 case UP -> {
+                    if (!finalPanel_movement)
+                        break;
                     direction_matrix_index_y -= 1;
                     direction_matrix_index_y = Math.floorMod(direction_matrix_index_y, 4);
                     map.direction = direction_choosing_matrix[direction_matrix_index_y][direction_matrix_index_x];
                 }
                 case DOWN -> {
+                    if (!finalPanel_movement)
+                        break;
                     direction_matrix_index_y += 1;
                     direction_matrix_index_y = Math.floorMod(direction_matrix_index_y, 4);
                     map.direction = direction_choosing_matrix[direction_matrix_index_y][direction_matrix_index_x];
                 }
                 case LEFT -> {
+                    if (!finalPanel_movement)
+                        break;
                     if(direction_matrix_index_y != 1 && direction_matrix_index_y != 3) {
                         direction_matrix_index_x -= 1;
                         direction_matrix_index_x = Math.floorMod(direction_matrix_index_x, 4);
@@ -233,6 +252,8 @@ public class Render3DNew extends Application{
                     }
                 }
                 case RIGHT -> {
+                    if (!finalPanel_movement)
+                        break;
                     if(direction_matrix_index_y != 1 && direction_matrix_index_y != 3) {
                         direction_matrix_index_x += 1;
                         direction_matrix_index_x = Math.floorMod(direction_matrix_index_x, 4);
@@ -240,6 +261,8 @@ public class Render3DNew extends Application{
                     }
                 }
                 case TAB-> {
+                    if(!map.panel_enable)
+                        break;
                     boolean topdown = map.direction.equals("y") || map.direction.equals("-y");
                     Render2DNew.create_map(stage, map.create_2d_image(map.get_platform_below_player(), map.direction), topdown);
                     close_all_timers();
@@ -433,6 +456,7 @@ class Map{
     //Slice panel = new Slice(new Box(Render3DNew.screen_width, Render3DNew.screen_height, 0.3));
     //Slice panel = new Slice(new Box(10, 10, 10));
     String direction = "x";
+    boolean panel_enable = true;
 
     public Map(){
         grid3D = new int[7][7][7];
@@ -480,7 +504,8 @@ class Map{
         for (Object3D obj: all_world_objects) {
             object_group.getChildren().add(obj.mesh);
         }
-        object_group.getChildren().add(panel.sub_scene);
+        if(panel_enable)
+            object_group.getChildren().add(panel.sub_scene);
 
         // apply rotation to group
         object_group.getTransforms().add(new Rotate(rotation.x, new Point3D(1, 0, 0)));

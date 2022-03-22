@@ -9,6 +9,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.*;
 import javafx.scene.transform.Rotate;
+import javafx.scene.transform.Transform;
 import javafx.stage.Stage;
 import java.util.ArrayList;
 import javafx.scene.image.Image;
@@ -129,6 +130,7 @@ public class Render3DNew extends Application{
         // map
         Map map = new Map();
         current_map = map;
+        map.direction = "y";
 
         map.add_box_to_grid(1, 0, 2, 0, 6, 2, 3);
         map.add_box_to_grid(1, 0, 2, 3, 6, 4, 3);
@@ -184,6 +186,13 @@ public class Render3DNew extends Application{
         camera.translateZProperty().set(-500);
         camera.getTransforms().add(new Rotate(-45, new Point3D(1, 1, 0)));
         scene.setCamera(camera);
+
+        // reset panel
+        int[][] grid_image = map.create_2d_image(1, map.direction);
+        map.panel.sub_scene = Render2DNew.create_panel_view(grid_image, 700);
+        map.update_object_group();
+        map.panel.transform_according_to_direction(map.direction);
+
     }
 
 
@@ -232,11 +241,11 @@ public class Render3DNew extends Application{
                 }
                 case TAB-> {
                     boolean topdown = map.direction.equals("y") || map.direction.equals("-y");
-                    Render2DNew.create_map(stage, map.create_2d_image(1, map.direction), topdown);
+                    Render2DNew.create_map(stage, map.create_2d_image(map.get_platform_below_player(), map.direction), topdown);
                     close_all_timers();
                 }
             }
-            int[][] image = map.create_2d_image(1, map.direction);
+            int[][] image = map.create_2d_image(map.get_platform_below_player(), map.direction);
             map.panel.sub_scene = Render2DNew.create_panel_view(image, 700);
             map.update_object_group();
             map.panel.transform_according_to_direction(map.direction);
@@ -269,14 +278,20 @@ public class Render3DNew extends Application{
                     map.object_group.getTransforms().add(new Rotate(-rotation_speed, new Point3D(1, 0, 0)));
                 if (rotate_inverse_x)
                     map.object_group.getTransforms().add(new Rotate(+rotation_speed, new Point3D(1, 0, 0)));
-                if (rotate_y)
-                    map.object_group.getTransforms().add(new Rotate(+rotation_speed, new Point3D(0, 1, 0)));
-                if (rotate_inverse_y)
-                    map.object_group.getTransforms().add(new Rotate(-rotation_speed, new Point3D(0, 1, 0)));
-                if (rotate_z)
-                    map.object_group.getTransforms().add(new Rotate(+rotation_speed, new Point3D(0, 0, 1)));
-                if (rotate_inverse_z)
-                    map.object_group.getTransforms().add(new Rotate(-rotation_speed, new Point3D(0, 0, 1)));
+                if (rotate_y) {
+                    Rotate rotation = new Rotate(+rotation_speed, new Point3D(0, 1, 0));
+                    rotation.setPivotX(map.object_group.getBoundsInLocal().getCenterX());
+                    rotation.setPivotY(map.object_group.getBoundsInLocal().getCenterY());
+                    rotation.setPivotZ(map.object_group.getBoundsInLocal().getCenterZ());
+                    map.object_group.getTransforms().add(rotation);
+                }
+                if (rotate_inverse_y) {
+                    Rotate rotation = new Rotate(-rotation_speed, new Point3D(0, 1, 0));
+                    rotation.setPivotX(map.object_group.getBoundsInLocal().getCenterX());
+                    rotation.setPivotY(map.object_group.getBoundsInLocal().getCenterY());
+                    rotation.setPivotZ(map.object_group.getBoundsInLocal().getCenterZ());
+                    map.object_group.getTransforms().add(rotation);
+                }
             }
         };
         movement.start();
@@ -724,6 +739,21 @@ class Map{
             grid3D[(int)p_position.x][(int)p_position.y][(int)p_position.z] = 2;
         }
         update_object_group();
+    }
+
+    public int get_platform_below_player(){
+        for(int x = 0; x < grid3D.length; x++) {
+            for (int y = 0; y < grid3D.length; y++) {
+                for (int z = 0; z < grid3D.length; z++) {
+                    if (grid3D[x][y][z] == 2){
+                        if (y-1 >= 0){
+                            return grid3D[x][y-1][z];
+                        }
+                    }
+                }
+            }
+        }
+        return 0;
     }
 }
 

@@ -5,16 +5,25 @@ import javafx.application.Application;
 import javafx.geometry.Point3D;
 import javafx.scene.*;
 import javafx.scene.layout.Pane;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.*;
 import javafx.scene.transform.Rotate;
 import javafx.stage.Stage;
+import java.io.File;
 import java.util.ArrayList;
 import javafx.scene.image.Image;
 
 
 public class Render3DNew extends Application{
+    static Stage stage;
+    static int screen_height = 600;
+    static int screen_width = 800;
+    static Map current_map = new Map();
+    static int level_number = 1;
+    static ArrayList<AnimationTimer> timers = new ArrayList<>();
     static boolean move_x=false, move_inverse_x=false, move_y=false, move_inverse_y=false, move_z=false, move_inverse_z=false;
     static boolean rotate_x=false, rotate_inverse_x=false, rotate_y=false, rotate_inverse_y=false, rotate_z=false, rotate_inverse_z=false;
     static double movement_speed = 2;
@@ -26,22 +35,13 @@ public class Render3DNew extends Application{
             new String[] {"-y", "-y", "-y", "-y"}};
     static int direction_matrix_index_x = 1;
     static int direction_matrix_index_y = 2;
-    static Stage stage;
-    static int screen_height = 600;
-    static int screen_width = 800;
 
-
-    static Map current_map = new Map();
-
-    static int level_number = 1;
-
-    // to be able to close all timers attached to stage without having each of them in separate variables we have to store them in an array
-    static ArrayList<AnimationTimer> timers = new ArrayList<>();
+    static MediaPlayer movement_sound = new MediaPlayer(new Media(new File("ES_Apple Keyboard 13 - SFX Producer.mp3").toURI().toString()));
+    static MediaPlayer transition_sound = new MediaPlayer(new Media(new File("ES_Fire Torch Move - SFX Producer.mp3").toURI().toString()));
 
     public static void main(String[] args){
         launch(args);
     }
-
 
     public void start(Stage primary_stage){
         System.out.println("use WASD to move the character");
@@ -60,7 +60,7 @@ public class Render3DNew extends Application{
         stage.getIcons().add(logo);
         stage.setTitle("Perspective");
         Pane root = new Pane();
-        Scene scene = new Scene(root, 800, 600, true, SceneAntialiasing.BALANCED);
+        Scene scene = new Scene(root, screen_width, screen_height, true, SceneAntialiasing.BALANCED);
         scene.setFill(Color.BLACK);
         stage.setScene(scene);
         stage.show();
@@ -121,7 +121,7 @@ public class Render3DNew extends Application{
         camera.translateXProperty().set(500);
         camera.translateYProperty().set(-500);
         camera.translateZProperty().set(-500);
-        camera.getTransforms().add(new Rotate(-45, new Point3D(1, 1, 0)));
+        camera.getTransforms().add(new Rotate(-45, new Point3D(1, 1, 0.13)));
         scene.setCamera(camera);
     }
 
@@ -170,7 +170,7 @@ public class Render3DNew extends Application{
         camera.translateXProperty().set(500);
         camera.translateYProperty().set(-500);
         camera.translateZProperty().set(-500);
-        camera.getTransforms().add(new Rotate(-45, new Point3D(1, 1, 0)));
+        camera.getTransforms().add(new Rotate(-45, new Point3D(1, 1, 0.13)));
         scene.setCamera(camera);
     }
 
@@ -197,7 +197,6 @@ public class Render3DNew extends Application{
         map.panel.transform_according_to_direction(map.direction);
 
     }
-
 
     static public void initialize_movement_system(Stage stage, Map map, String... arguments){
         boolean panel_movement = true, panel_display = true;
@@ -266,6 +265,8 @@ public class Render3DNew extends Application{
                     boolean topdown = map.direction.equals("y") || map.direction.equals("-y");
                     Render2DNew.create_map(stage, map.create_2d_image(map.get_platform_below_player(), map.direction), topdown);
                     close_all_timers();
+                    Render3DNew.transition_sound.stop();
+                    Render3DNew.transition_sound.play();
                 }
             }
             int[][] image = map.create_2d_image(map.get_platform_below_player(), map.direction);
@@ -332,15 +333,18 @@ public class Render3DNew extends Application{
 
 class Object3D{
     Shape3D mesh;
+
     static ArrayList<Object3D> all_objects = new ArrayList<>();
 
     public Object3D(){
         all_objects.add(this);
     }
+
     public Object3D(Shape3D mesh){
         all_objects.add(this);
         this.mesh = mesh;
     }
+
     public Object3D(Shape3D mesh, double x, double y, double z){
         all_objects.add(this);
         mesh.translateXProperty().set(x);
@@ -355,13 +359,6 @@ class Object3D{
         mesh.getTransforms().add(new Rotate(z, new Point3D(0, 0, 1)));
     }
 
-
-    // about display:
-    // there is no integrated way in javafx to draw 3D shapes using canvas and graphical context
-    // so object3d instances will be displayed by adding them to scene directly
-    // so no need to implement a void display method
-
-
     public void set_transparency(double value){
         PhongMaterial material = new PhongMaterial();
         material.setDiffuseColor(new Color(.5, .5, .5, 1-value));
@@ -371,11 +368,13 @@ class Object3D{
 
 class Slice{
     SubScene sub_scene;
+
     public Slice(SubScene sub_scene){
         this.sub_scene = sub_scene;
         this.sub_scene.setOpacity(0.3);
         sub_scene.setFill(Color.WHITE);
     }
+
     public void transform_according_to_direction(String direction){
         int offset = 100;
         double length  = sub_scene.getBoundsInLocal().getWidth();
@@ -424,11 +423,13 @@ class Slice{
 class Vertex3D{
     // a vertex3d can be used to represent a 3d point or a 3d vector
     double x, y, z;
+
     public Vertex3D(double x, double y, double z){
         this.x = x;
         this.y = y;
         this.z = z;
     }
+
     public String toString(){
         return "X:"+x+" Y:"+y+" Z:"+z;
     }
@@ -437,26 +438,31 @@ class Vertex3D{
     public Vertex3D add(Vertex3D otherPoint){
         return new Vertex3D(this.x+otherPoint.x, this.y+otherPoint.y, this.z+otherPoint.z);
     }
+
     public Vertex3D add(double value){
         return new Vertex3D(this.x+value, this.y+value, this.z+value);
     }
+
     public Vertex3D multiply(Vertex3D otherPoint){
         return new Vertex3D(this.x*otherPoint.x, this.y*otherPoint.y, this.z*otherPoint.z);
     }
+
     public Vertex3D multiply(double value){
         return new Vertex3D(this.x*value, this.y*value, this.z*value);
     }
 }
 
 class Map{
-    int[][][] grid3D;
-    double unit_cube_length = 100;
+
     ArrayList<Object3D> all_world_objects = new ArrayList<>();
+    int[][][] grid3D;
     Slice panel;
-    //Slice panel = new Slice(new Box(Render3DNew.screen_width, Render3DNew.screen_height, 0.3));
-    //Slice panel = new Slice(new Box(10, 10, 10));
     String direction = "x";
     boolean panel_enable = true;
+    Group object_group = new Group();
+    Vertex3D rotation = new Vertex3D(0, 0, 0);
+    Vertex3D position = new Vertex3D(0, 0, 0);
+    double unit_cube_length = 100;
 
     public Map(){
         grid3D = new int[7][7][7];
@@ -466,10 +472,6 @@ class Map{
         grid3D = new int[grid_size][grid_size][grid_size];
         panel = new Slice(new SubScene(new Pane(), grid_size * unit_cube_length, grid_size * unit_cube_length, true, SceneAntialiasing.BALANCED));
     }
-
-    Group object_group = new Group();
-    Vertex3D rotation = new Vertex3D(0, 0, 0);
-    Vertex3D position = new Vertex3D(0, 0, 0);
 
     public void update_object_group(){
         all_world_objects.clear();
@@ -670,6 +672,8 @@ class Map{
             grid3D[(int)location.x][(int)location.y][(int)location.z] = 2;
         }
         update_object_group();
+        Render3DNew.movement_sound.stop();
+        Render3DNew.movement_sound.play();
     }
 
     void reposition_player_from_image(int[][] image){

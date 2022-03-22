@@ -86,6 +86,8 @@ public class Render2DNew extends Application {
         stage.getScene().setOnKeyPressed(event -> {
             switch (event.getCode()){
                 case TAB -> {
+                    Render3DNew.transition_sound.stop();
+                    Render3DNew.transition_sound.play();
                     Render3DNew.return_to_current_map(stage, map.grid2D);
                 }
                 case W -> {

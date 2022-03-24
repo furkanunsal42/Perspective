@@ -3,24 +3,25 @@ No plans yet
 (maybe a tree like view for level selection)
 
 Sound
-No plans yet
+Work in progress
 
-level designer
+Level Designer
 no plans yet
 
-level solver algorithm
+Level Solver Algorithm
 not started
 
-automatic level creation algorithm
+Automatic Level Creation Algorithm
 maybe
 
-community level creation marketplace and highscores
+Community Level Creation Marketplace and Highscores
 maybe
 
+--- Core Game Mechanics ---
 
 3D
 - 3d graphics 								                        done needs improvement later
-- rotating the world 							                    done needs improvement later
+- rotating the world 							                    done
 - displaying the 2d world in slice 					                done
 - transition to 2d animation						                work in progress
 - movement in 3d                                                    done
@@ -36,9 +37,10 @@ maybe
 3D-2D
 3d to 2d grid flattening                                            done
 2d to 3d player position calculation                                done
-cancel transition if player isn't shown on the map                  work in progress
 
 
 Known bugs: (if you find a bug please report it here with a good description of why or when it happens)
 - player disappears when transitioned into a direction where player cannot be seen      not started
 - player can fly while moving in 3d world                                               not started
+- movement sound has a delay at the start, so it feels unnatural when player moves
+repeatedly. sound file should be edited.                                                not started

@@ -706,7 +706,7 @@ class Map{
                     int value = grid3D[x][y][z];
                     if (y-1 > 0 && y-1 < unit_length) {
                         int below_value = grid3D[x][y-1][z];
-                        if (value == 0 && below_value == 1) {
+                        if (value == 0 && below_value != 0) {
                             player_positions_3D.add(new Vertex3D(x, y, z));
                             break;
                         }
@@ -716,7 +716,7 @@ class Map{
                     int value = grid3D[x][y][z];
                     if (y - 1 > 0) {
                         int below_value = grid3D[x][y - 1][z];
-                        if (value == 0 && below_value == 1) {
+                        if (value == 0 && below_value != 0) {
                             player_positions_3D.add(new Vertex3D(x, y, z));
                             break;
                         }
@@ -726,7 +726,7 @@ class Map{
                     int value = grid3D[x][y][z];
                     if (y - 1 > 0) {
                         int below_value = grid3D[x][y - 1][z];
-                        if (value == 0 && below_value == 1) {
+                        if (value == 0 && below_value != 0) {
                             player_positions_3D.add(new Vertex3D(x, y, z));
                             break;
                         }
@@ -736,7 +736,7 @@ class Map{
                     int value = grid3D[x][y][z];
                     if (y - 1 > 0) {
                         int below_value = grid3D[x][y - 1][z];
-                        if (value == 0 && below_value == 1) {
+                        if (value == 0 && below_value != 0) {
                             player_positions_3D.add(new Vertex3D(x, y, z));
                             break;
                         }
@@ -746,7 +746,7 @@ class Map{
                     int value = grid3D[x][y][z];
                     if (y - 1 > 0) {
                         int below_value = grid3D[x][y - 1][z];
-                        if (value == 0 && below_value == 1) {
+                        if (value == 0 && below_value != 0) {
                             player_positions_3D.add(new Vertex3D(x, y, z));
                             break;
                         }
@@ -756,7 +756,7 @@ class Map{
                     int value = grid3D[x][y][z];
                     if (y - 1 > 0) {
                         int below_value = grid3D[x][y - 1][z];
-                        if (value == 0 && below_value == 1) {
+                        if (value == 0 && below_value != 0) {
                             player_positions_3D.add(new Vertex3D(x, y, z));
                             break;
                         }

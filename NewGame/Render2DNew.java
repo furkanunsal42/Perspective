@@ -255,6 +255,8 @@ class Map2D{
             grid2D[(int)location.x][(int)location.y] = 2;
         }
         update_object_group();
+        Render3DNew.movement_sound.stop();
+        Render3DNew.movement_sound.play();
     }
 }
 

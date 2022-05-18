@@ -2,19 +2,29 @@ package NewGame;
 
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Point3D;
 import javafx.scene.*;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.*;
+import javafx.scene.text.Font;
 import javafx.scene.transform.Rotate;
 import javafx.stage.Stage;
+
 import java.io.File;
 import java.util.ArrayList;
 import javafx.scene.image.Image;
+import org.w3c.dom.css.RGBColor;
 
 
 public class Render3DNew extends Application{
@@ -51,12 +61,12 @@ public class Render3DNew extends Application{
         stage = primary_stage;
 
         // create the first map
-        create_world_1(primary_stage);
+        create_menu();
     }
 
     static public void set_stage(){
         // standard javafx windows elements
-        Image logo=new Image("file:logo.jpg");
+        Image logo = new Image("file:logo.jpg");
         stage.getIcons().add(logo);
         stage.setTitle("Perspective");
         Pane root = new Pane();
@@ -66,21 +76,63 @@ public class Render3DNew extends Application{
         stage.show();
     }
 
+    static public void create_menu(){
+        set_stage();
+        Scene scene = stage.getScene();
+        Pane root = (Pane)scene.getRoot();
+
+        Canvas canvas = new Canvas(screen_width, screen_height);
+        GraphicsContext g =  canvas.getGraphicsContext2D();
+        root.getChildren().add(canvas);
+
+        AnimationTimer text_animaton = new AnimationTimer() {
+            @Override
+            public void handle(long l) {
+                Vertex2D button_size = new Vertex2D(100, 60);
+                g.setFill(Color.WHITE);
+                g.drawImage(new Image("file:Background.png"), 0, 0);
+
+                g.setFill(Color.rgb(229,83,85));
+                Font font = Font.loadFont("file:Font.ttf", 60);
+                Font font2 = Font.loadFont("file:Font2.ttf", 90);
+                g.setFont(font2);
+                g.fillText("PERSPECTIVE", screen_width/2.0 - 170, screen_height/2.0 - 100);
+
+                g.setFill(Color.MINTCREAM);
+                font = Font.loadFont("file:Font.ttf", 30);
+                g.setFont(font);
+                g.fillText("press enter to play!", screen_width/2.0 - 170, screen_height/2.0 + 50 + 20*Math.cos(l/30000000000.0 * 180 / Math.PI));
+
+            }
+        };
+        text_animaton.start();
+        timers.add(text_animaton);
+        scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent keyEvent) {
+                create_world_1();
+            }
+        });
+
+    }
+
+
+
     static public void create_world_by_number(int number){
         switch (number){
-            case 1 -> create_world_1(stage);
-            case 2 -> create_world_2(stage);
+            case 1 -> create_world_1();
+            case 2 -> create_world_2();
         }
     }
 
-    static public void create_world_1(Stage stage){
+    static public void create_world_1(){
         // stop all timers from previous level
         set_stage();
         close_all_timers();
-
         // map
         Map map = new Map();
         current_map = map;
+
 
         // disable panel
         map.panel_enable = false;
@@ -125,7 +177,7 @@ public class Render3DNew extends Application{
         scene.setCamera(camera);
     }
 
-    static public void create_world_2(Stage stage){
+    static public void create_world_2(){
         // stop all timers from previous level
         set_stage();
         close_all_timers();
@@ -353,7 +405,7 @@ class Object3D{
         this.mesh = mesh;
     }
 
-    public void set_rotation(double x, double y, double z){
+    public void add_rotation(double x, double y, double z){
         mesh.getTransforms().add(new Rotate(x, new Point3D(1, 0, 0)));
         mesh.getTransforms().add(new Rotate(y, new Point3D(0, 1, 0)));
         mesh.getTransforms().add(new Rotate(z, new Point3D(0, 0, 1)));

@@ -2,14 +2,12 @@ package NewGame;
 
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
-import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Point3D;
 import javafx.scene.*;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.media.Media;
@@ -24,7 +22,6 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.util.ArrayList;
 import javafx.scene.image.Image;
-import org.w3c.dom.css.RGBColor;
 
 
 public class Render3DNew extends Application{
@@ -110,7 +107,8 @@ public class Render3DNew extends Application{
         scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent keyEvent) {
-                create_world_1();
+                if (keyEvent.getCode() == KeyCode.ENTER)
+                    create_world_1();
             }
         });
 
@@ -136,7 +134,6 @@ public class Render3DNew extends Application{
 
         // disable panel
         map.panel_enable = false;
-
 
         map.add_box_to_grid(1, 0, 2, 0, 6, 2, 6);
 

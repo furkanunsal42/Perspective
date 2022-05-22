@@ -197,6 +197,8 @@ class Map2D{
                         all_world_objects.add(new Object2D(new Rectangle(unit_square_length, unit_square_length, Color.WHITE), (x)*unit_square_length, (y)*unit_square_length));
                     player_positions.add(new Vertex2D(x, y));
                 }
+                if (value == 4)
+                    all_world_objects.add(new Object2D(new Rectangle(unit_square_length, unit_square_length, Color.GRAY), (x)*unit_square_length, (y)*unit_square_length));
             }
         }
 
@@ -229,8 +231,8 @@ class Map2D{
                             // inverted purposely      y+x                         x+y
                             int new_x = (int)direction.y+x, new_y = (int)direction.x+y;
                             if (topdown) {
-                                if (grid2D[new_x][new_y] == 1) {
-                                    grid2D[x][y] = 1;
+                                if (grid2D[new_x][new_y] == 1 || grid2D[new_x][new_y] == 4) {
+                                    grid2D[x][y] = grid2D[new_x][new_y]; // 1
                                     new_locations.add(new Vertex2D(new_x, new_y));
                                 }
                             }

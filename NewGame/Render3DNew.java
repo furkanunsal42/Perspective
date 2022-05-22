@@ -42,7 +42,8 @@ public class Render3DNew extends Application{
             new String[] {"-y", "-y", "-y", "-y"}};
     static int direction_matrix_index_x = 1;
     static int direction_matrix_index_y = 2;
-
+    static boolean level_is_finished = false;
+    static int image_type = 1;
     static MediaPlayer movement_sound = new MediaPlayer(new Media(new File("ES_Apple Keyboard 13 - SFX Producer.mp3").toURI().toString()));
     static MediaPlayer transition_sound = new MediaPlayer(new Media(new File("ES_Fire Torch Move - SFX Producer.mp3").toURI().toString()));
 
@@ -117,9 +118,15 @@ public class Render3DNew extends Application{
 
 
     static public void create_world_by_number(int number){
+        System.out.println(number);
         switch (number){
             case 1 -> create_world_1();
             case 2 -> create_world_2();
+            case 3 -> create_world_3();
+            case 4 -> create_world_4();
+            case 5 -> create_world_5();
+            case 6 -> create_world_6();
+            case 7 -> create_world_7();
         }
     }
 
@@ -160,7 +167,7 @@ public class Render3DNew extends Application{
         root.getChildren().add(map.object_group);
 
         // panel initial position
-        int[][] image = map.create_2d_image(1, map.direction);
+        int[][] image = map.create_2d_image(map.get_platform_below_player(), map.direction);
         map.panel.sub_scene = Render2DNew.create_panel_view(image, 700);
         map.update_object_group();
         map.panel.transform_according_to_direction(map.direction);
@@ -209,7 +216,7 @@ public class Render3DNew extends Application{
         root.getChildren().add(map.object_group);
 
         // panel initial position
-        int[][] image = map.create_2d_image(1, map.direction);
+        int[][] image = map.create_2d_image(map.get_platform_below_player(), map.direction);
         map.panel.sub_scene = Render2DNew.create_panel_view(image, 700);
         map.update_object_group();
         map.panel.transform_according_to_direction(map.direction);
@@ -223,10 +230,270 @@ public class Render3DNew extends Application{
         scene.setCamera(camera);
     }
 
+    static public void create_world_3(){
+        // stop all timers from previous level
+        set_stage();
+        close_all_timers();
+
+        // map
+        Map map = new Map();
+        current_map = map;
+        map.direction = "y";
+
+        map.add_box_to_grid(1, 0, 2, 0, 2, 2, 2);
+        map.add_box_to_grid(1, 3, 2, 4, 6, 2, 6);
+
+        // type 2 is player
+        map.grid3D[1][3][1] = 2;
+
+        //type 3 is target
+        map.grid3D[5][3][5] = 3;
+
+        // finish creating map
+        map.update_object_group();
+
+        // start movement system
+        initialize_movement_system(stage, map);
+
+        // access to scene and root
+        Scene scene = stage.getScene();
+        Pane root = (Pane)scene.getRoot();
+
+        // display objects in the scene
+        root.getChildren().add(map.object_group);
+
+        // panel initial position
+        int[][] image = map.create_2d_image(map.get_platform_below_player(), map.direction);
+        map.panel.sub_scene = Render2DNew.create_panel_view(image, 700);
+        map.update_object_group();
+        map.panel.transform_according_to_direction(map.direction);
+
+        // setup camera
+        PerspectiveCamera camera = new PerspectiveCamera();
+        camera.translateXProperty().set(500);
+        camera.translateYProperty().set(-500);
+        camera.translateZProperty().set(-500);
+        camera.getTransforms().add(new Rotate(-45, new Point3D(1, 1, 0.13)));
+        scene.setCamera(camera);
+    }
+
+    static public void create_world_4(){
+        // stop all timers from previous level
+        set_stage();
+        close_all_timers();
+
+        // map
+        Map map = new Map();
+        current_map = map;
+        map.direction = "y";
+
+        map.add_box_to_grid(1, 4, 4, 0, 6, 4, 1);
+        map.add_box_to_grid(1, 4, 2, 0, 6, 2, 2);
+        map.add_box_to_grid(1, 3, 2, 4, 1, 2, 5);
+        map.add_box_to_grid(1, 4, 4, 4, 6, 4, 5);
+
+
+        // type 2 is player
+        map.grid3D[6][5][0] = 2;
+
+        //type 3 is target
+        map.grid3D[6][5][5] = 3;
+
+        // finish creating map
+        map.update_object_group();
+
+        // start movement system
+        initialize_movement_system(stage, map);
+
+        // access to scene and root
+        Scene scene = stage.getScene();
+        Pane root = (Pane)scene.getRoot();
+
+        // display objects in the scene
+        root.getChildren().add(map.object_group);
+
+        // panel initial position
+        int[][] image = map.create_2d_image(map.get_platform_below_player(), map.direction);
+        map.panel.sub_scene = Render2DNew.create_panel_view(image, 700);
+        map.update_object_group();
+        map.panel.transform_according_to_direction(map.direction);
+
+        // setup camera
+        PerspectiveCamera camera = new PerspectiveCamera();
+        camera.translateXProperty().set(500);
+        camera.translateYProperty().set(-500);
+        camera.translateZProperty().set(-500);
+        camera.getTransforms().add(new Rotate(-45, new Point3D(1, 1, 0.13)));
+        scene.setCamera(camera);
+    }
+
+    static public void create_world_5(){
+        // stop all timers from previous level
+        set_stage();
+        close_all_timers();
+
+        // map
+        Map map = new Map();
+        current_map = map;
+        map.direction = "y";
+
+        map.add_box_to_grid(4, 6, 4, 0, 4, 4, 2);
+        map.add_box_to_grid(1, 3, 4, 0, 2, 4, 1);
+        map.add_box_to_grid(1, 3, 4, 5, 2, 4, 5);
+        map.add_box_to_grid(1, 6, 3, 3, 4, 3, 5);
+
+        // type 2 is player
+        map.grid3D[5][5][1] = 2;
+
+        //type 3 is target
+        map.grid3D[5][4][5] = 3;
+
+        // finish creating map
+        map.update_object_group();
+
+        // start movement system
+        initialize_movement_system(stage, map);
+
+        // access to scene and root
+        Scene scene = stage.getScene();
+        Pane root = (Pane)scene.getRoot();
+
+        // display objects in the scene
+        root.getChildren().add(map.object_group);
+
+        // panel initial position
+        int[][] image = map.create_2d_image(map.get_platform_below_player(), map.direction);
+        map.panel.sub_scene = Render2DNew.create_panel_view(image, 700);
+        map.update_object_group();
+        map.panel.transform_according_to_direction(map.direction);
+
+        // setup camera
+        PerspectiveCamera camera = new PerspectiveCamera();
+        camera.translateXProperty().set(500);
+        camera.translateYProperty().set(-500);
+        camera.translateZProperty().set(-500);
+        camera.getTransforms().add(new Rotate(-45, new Point3D(1, 1, 0.13)));
+        scene.setCamera(camera);
+    }
+
+    static public void create_world_6(){
+        // stop all timers from previous level
+        set_stage();
+        close_all_timers();
+
+        // map
+        Map map = new Map();
+        current_map = map;
+        map.direction = "y";
+
+        map.grid3D[5][4][0] = 4;
+        map.grid3D[6][4][1] = 4;
+        map.grid3D[5][4][2] = 4;
+        map.grid3D[6][4][3] = 4;
+        map.grid3D[5][4][4] = 4;
+        map.grid3D[6][4][5] = 4;
+        map.grid3D[5][4][6] = 4;
+
+        map.grid3D[5][3][1] = 1;
+        map.grid3D[6][3][2] = 1;
+        map.grid3D[5][3][3] = 1;
+        map.grid3D[6][3][4] = 1;
+        map.grid3D[5][3][5] = 1;
+        map.grid3D[6][3][6] = 1;
+
+        map.grid3D[4][4][6] = 1;
+        map.grid3D[3][4][6] = 1;
+
+        map.grid3D[3][3][5] = 1;
+
+        map.add_box_to_grid(1, 4, 3, 0, 2, 3, 0);
+        map.grid3D[5][5][0] = 2;
+        map.grid3D[4][4][0] = 3;
+
+        // finish creating map
+        map.update_object_group();
+
+        // start movement system
+        initialize_movement_system(stage, map);
+
+        // access to scene and root
+        Scene scene = stage.getScene();
+        Pane root = (Pane)scene.getRoot();
+
+        // display objects in the scene
+        root.getChildren().add(map.object_group);
+
+        int[][] image = map.create_2d_image(map.get_platform_below_player(), map.direction);
+        map.panel.sub_scene = Render2DNew.create_panel_view(image, 700);
+        map.update_object_group();
+        map.panel.transform_according_to_direction(map.direction);
+
+        // setup camera
+        PerspectiveCamera camera = new PerspectiveCamera();
+        camera.translateXProperty().set(500);
+        camera.translateYProperty().set(-500);
+        camera.translateZProperty().set(-500);
+        camera.getTransforms().add(new Rotate(-45, new Point3D(1, 1, 0.13)));
+        scene.setCamera(camera);
+    }
+
+    static public void create_world_7(){
+        // stop all timers from previous level
+        set_stage();
+        close_all_timers();
+
+        // map
+        Map map = new Map();
+        current_map = map;
+        map.direction = "y";
+
+        map.add_box_to_grid(4, 6, 4, 0, 5, 4, 1);
+        map.grid3D[6][3][2] = 4;
+        map.grid3D[6][2][3] = 4;
+        map.grid3D[6][2][4] = 4;
+
+        map.grid3D[3][2][4] = 4;
+        map.grid3D[3][3][3] = 4;
+
+        map.add_box_to_grid(1, 4, 3, 1, 3, 3, 2);
+        map.grid3D[4][3][2] = 0;
+
+        map.add_box_to_grid(1, 6, 2, 0, 5, 2, 1);
+
+        map.grid3D[6][5][0] = 2;
+        map.grid3D[6][3][0] = 3;
+        // finish creating map
+        map.update_object_group();
+
+        // start movement system
+        initialize_movement_system(stage, map);
+
+        // access to scene and root
+        Scene scene = stage.getScene();
+        Pane root = (Pane)scene.getRoot();
+
+        // display objects in the scene
+        root.getChildren().add(map.object_group);
+
+        int[][] image = map.create_2d_image(map.get_platform_below_player(), map.direction);
+        map.panel.sub_scene = Render2DNew.create_panel_view(image, 700);
+        map.update_object_group();
+        map.panel.transform_according_to_direction(map.direction);
+
+        // setup camera
+        PerspectiveCamera camera = new PerspectiveCamera();
+        camera.translateXProperty().set(500);
+        camera.translateYProperty().set(-500);
+        camera.translateZProperty().set(-500);
+        camera.getTransforms().add(new Rotate(-45, new Point3D(1, 1, 0.13)));
+        scene.setCamera(camera);
+    }
+
+
     static void return_to_current_map(Stage stage, int[][] image){
         set_stage();
         Map map = current_map;
-        map.reposition_player_from_image(image);
+        map.reposition_player_from_image(image, image_type);
         map.update_object_group();
         initialize_movement_system(stage, map);
         Scene scene = stage.getScene();
@@ -245,6 +512,8 @@ public class Render3DNew extends Application{
         map.update_object_group();
         map.panel.transform_according_to_direction(map.direction);
 
+        if(level_is_finished)
+            create_world_by_number(++level_number);
     }
 
     static public void initialize_movement_system(Stage stage, Map map, String... arguments){
@@ -266,6 +535,7 @@ public class Render3DNew extends Application{
 
         // effectively final variables are necessary to use them locally in lambda expression
         boolean finalPanel_movement = panel_movement;
+
         stage.getScene().setOnKeyPressed(event ->{
             switch (event.getCode()) {
                 case W -> map.move_player(new Vertex3D(0, 0, 1));
@@ -312,7 +582,8 @@ public class Render3DNew extends Application{
                     if(!map.panel_enable)
                         break;
                     boolean topdown = map.direction.equals("y") || map.direction.equals("-y");
-                    Render2DNew.create_map(stage, map.create_2d_image(map.get_platform_below_player(), map.direction), topdown);
+                    Render3DNew.image_type = map.get_platform_below_player();
+                    Render2DNew.create_map(stage, map.create_2d_image(Render3DNew.image_type, map.direction), topdown);
                     close_all_timers();
                     Render3DNew.transition_sound.stop();
                     Render3DNew.transition_sound.play();
@@ -322,7 +593,6 @@ public class Render3DNew extends Application{
             map.panel.sub_scene = Render2DNew.create_panel_view(image, 700);
             map.update_object_group();
             map.panel.transform_according_to_direction(map.direction);
-
         });
 
         stage.getScene().setOnKeyReleased(event ->{
@@ -546,6 +816,11 @@ class Map{
                         box.setMaterial(material);
                         all_world_objects.add(new Object3D(box, (grid3D.length - x) * unit_cube_length, (grid3D[0].length - y) * unit_cube_length, z * unit_cube_length));
                     }
+                    else if (value == 4) {
+                        material.setDiffuseColor(Color.GRAY);
+                        box.setMaterial(material);
+                        all_world_objects.add(new Object3D(box, (grid3D.length - x) * unit_cube_length, (grid3D[0].length - y) * unit_cube_length, z * unit_cube_length));
+                    }
                 }
             }
         }
@@ -569,33 +844,28 @@ class Map{
         object_group.translateXProperty().set(position.z);
 
         // check if level ended
+        Render3DNew.level_is_finished = false;
         for(int x = 0; x < grid3D.length; x++){
             for(int y = 0; y < grid3D.length; y++){
                 for(int z = 0; z < grid3D.length; z++){
                     if(grid3D[x][y][z] == 2) {
                         if (x+1 < grid3D.length && grid3D[x+1][y][z] == 3){
-                            Render3DNew.level_number += 1;
-                            Render3DNew.create_world_by_number(Render3DNew.level_number);
+                            Render3DNew.level_is_finished = true;
                         }
                         else if (x-1 >= 0 && grid3D[x-1][y][z] == 3){
-                            Render3DNew.level_number += 1;
-                            Render3DNew.create_world_by_number(Render3DNew.level_number);
+                            Render3DNew.level_is_finished = true;
                         }
-                        if (y+1 < grid3D.length && grid3D[x][y+1][z] == 3){
-                            Render3DNew.level_number += 1;
-                            Render3DNew.create_world_by_number(Render3DNew.level_number);
+                        else if (y+1 < grid3D.length && grid3D[x][y+1][z] == 3){
+                            Render3DNew.level_is_finished = true;
                         }
                         else if (y-1 >= 0 && grid3D[x][y-1][z] == 3){
-                            Render3DNew.level_number += 1;
-                            Render3DNew.create_world_by_number(Render3DNew.level_number);
+                            Render3DNew.level_is_finished = true;
                         }
-                        if (z+1 < grid3D.length && grid3D[x][y][z+1] == 3){
-                            Render3DNew.level_number += 1;
-                            Render3DNew.create_world_by_number(Render3DNew.level_number);
+                        else if (z+1 < grid3D.length && grid3D[x][y][z+1] == 3){
+                            Render3DNew.level_is_finished = true;
                         }
                         else if (z-1 >= 0 && grid3D[x][y][z-1] == 3){
-                            Render3DNew.level_number += 1;
-                            Render3DNew.create_world_by_number(Render3DNew.level_number);
+                            Render3DNew.level_is_finished = true;
                         }
                     }
                 }
@@ -604,6 +874,22 @@ class Map{
     }
 
     void add_box_to_grid(int type, int x1, int y1, int z1, int x2, int y2, int z2){
+        if (x1 > x2) {
+            int temp = x2;
+            x2 = x1;
+            x1 = temp;
+        }
+        if (y1 > y2) {
+            int temp = y2;
+            y2 = y1;
+            y1 = temp;
+        }
+        if (z1 > z2) {
+            int temp = z2;
+            z2 = z1;
+            z1 = temp;
+        }
+
         for (int x = x1; x <= x2; x++){
             for (int y = y1; y <= y2; y++){
                 for (int z = z1; z <= z2; z++){
@@ -708,7 +994,7 @@ class Map{
                         if (direction.x + x < grid3D.length && direction.y + y < grid3D.length && direction.z + z < grid3D.length
                                 && direction.x + x >= 0 && direction.y + y >= 0  && direction.z + z >= 0){
                             int new_x = (int)direction.x+x,new_y = (int)direction.y+y, new_z = (int)direction.z+z;
-                            if(grid3D[new_x][new_y][new_z] == 0 && grid3D[new_x][new_y-1][new_z] == 1) {
+                            if(grid3D[new_x][new_y][new_z] == 0 && (grid3D[new_x][new_y-1][new_z] == 1 || grid3D[new_x][new_y-1][new_z] == 4)) {
                                 grid3D[x][y][z] = 0;
                                 new_locations.add(new Vertex3D(new_x, new_y, new_z));
                             }
@@ -723,9 +1009,15 @@ class Map{
         update_object_group();
         Render3DNew.movement_sound.stop();
         Render3DNew.movement_sound.play();
+
+        // if the level is finished create the next level
+        if(Render3DNew.level_is_finished){
+            Render3DNew.level_number++;
+            Render3DNew.create_world_by_number(Render3DNew.level_number);
+        }
     }
 
-    void reposition_player_from_image(int[][] image){
+    void reposition_player_from_image(int[][] image, int type){
 
         ArrayList<Vertex2D> player_positions_2D = new ArrayList<>();
 
@@ -755,7 +1047,7 @@ class Map{
                     int value = grid3D[x][y][z];
                     if (y-1 > 0 && y-1 < unit_length) {
                         int below_value = grid3D[x][y-1][z];
-                        if (value == 0 && below_value != 0) {
+                        if (value == 0 && below_value == type) {
                             player_positions_3D.add(new Vertex3D(x, y, z));
                             break;
                         }
@@ -765,7 +1057,7 @@ class Map{
                     int value = grid3D[x][y][z];
                     if (y - 1 > 0) {
                         int below_value = grid3D[x][y - 1][z];
-                        if (value == 0 && below_value != 0) {
+                        if (value == 0 && below_value == type) {
                             player_positions_3D.add(new Vertex3D(x, y, z));
                             break;
                         }
@@ -775,7 +1067,7 @@ class Map{
                     int value = grid3D[x][y][z];
                     if (y - 1 > 0) {
                         int below_value = grid3D[x][y - 1][z];
-                        if (value == 0 && below_value != 0) {
+                        if (value == 0 && below_value == type) {
                             player_positions_3D.add(new Vertex3D(x, y, z));
                             break;
                         }
@@ -785,7 +1077,7 @@ class Map{
                     int value = grid3D[x][y][z];
                     if (y - 1 > 0) {
                         int below_value = grid3D[x][y - 1][z];
-                        if (value == 0 && below_value != 0) {
+                        if (value == 0 && below_value == type) {
                             player_positions_3D.add(new Vertex3D(x, y, z));
                             break;
                         }
@@ -795,17 +1087,17 @@ class Map{
                     int value = grid3D[x][y][z];
                     if (y - 1 > 0) {
                         int below_value = grid3D[x][y - 1][z];
-                        if (value == 0 && below_value != 0) {
+                        if (value == 0 && below_value == type) {
                             player_positions_3D.add(new Vertex3D(x, y, z));
                             break;
                         }
                     }
                 } else if (direction.equals("-z")) {
-                    int x = (int)player_position.x, y = (int)player_position.y, z = unit_length - 1 - i;
+                    int x = (int)player_position.x, y = unit_length - 1 -(int)player_position.y, z = unit_length - 1 - i;
                     int value = grid3D[x][y][z];
                     if (y - 1 > 0) {
                         int below_value = grid3D[x][y - 1][z];
-                        if (value == 0 && below_value != 0) {
+                        if (value == 0 && below_value == type) {
                             player_positions_3D.add(new Vertex3D(x, y, z));
                             break;
                         }

@@ -290,14 +290,14 @@ public class Render3DNew extends Application{
         map.add_box_to_grid(1, 4, 4, 0, 6, 4, 1);
         map.add_box_to_grid(1, 4, 2, 0, 6, 2, 2);
         map.add_box_to_grid(1, 3, 2, 4, 1, 2, 5);
-        map.add_box_to_grid(1, 4, 4, 4, 6, 4, 5);
+        map.add_box_to_grid(1, 4, 5, 4, 6, 5, 5);
 
 
         // type 2 is player
         map.grid3D[6][5][0] = 2;
 
         //type 3 is target
-        map.grid3D[6][5][5] = 3;
+        map.grid3D[6][6][5] = 3;
 
         // finish creating map
         map.update_object_group();

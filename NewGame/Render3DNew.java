@@ -489,7 +489,6 @@ public class Render3DNew extends Application{
         scene.setCamera(camera);
     }
 
-
     static void return_to_current_map(Stage stage, int[][] image){
         set_stage();
         Map map = current_map;
@@ -507,7 +506,7 @@ public class Render3DNew extends Application{
         scene.setCamera(camera);
 
         // reset panel
-        int[][] grid_image = map.create_2d_image(1, map.direction);
+        int[][] grid_image = map.create_2d_image(image_type, map.direction);
         map.panel.sub_scene = Render2DNew.create_panel_view(grid_image, 700);
         map.update_object_group();
         map.panel.transform_according_to_direction(map.direction);

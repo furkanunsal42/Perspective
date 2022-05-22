@@ -708,7 +708,7 @@ class Map{
                         if (direction.x + x < grid3D.length && direction.y + y < grid3D.length && direction.z + z < grid3D.length
                                 && direction.x + x >= 0 && direction.y + y >= 0  && direction.z + z >= 0){
                             int new_x = (int)direction.x+x,new_y = (int)direction.y+y, new_z = (int)direction.z+z;
-                            if(grid3D[new_x][new_y][new_z] == 0) {
+                            if(grid3D[new_x][new_y][new_z] == 0 && grid3D[new_x][new_y-1][new_z] == 1) {
                                 grid3D[x][y][z] = 0;
                                 new_locations.add(new Vertex3D(new_x, new_y, new_z));
                             }

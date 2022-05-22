@@ -1020,14 +1020,13 @@ class Map{
     void reposition_player_from_image(int[][] image, int type){
 
         ArrayList<Vertex2D> player_positions_2D = new ArrayList<>();
-
         for (int x = 0; x < image.length; x++){
             for (int y = 0; y < image.length; y++){
                 if (image[x][y] == 2)
                     player_positions_2D.add(new Vertex2D(y, x));
             }
         }
-
+        ArrayList<Vertex3D> player_old_positions = new ArrayList<>();
         ArrayList<Vertex3D> player_positions_3D = new ArrayList<>();
         int unit_length = grid3D.length;
 
@@ -1035,7 +1034,7 @@ class Map{
             for (int y = 0; y < unit_length; y++) {
                 for (int z = 0; z < unit_length; z++) {
                     if (grid3D[x][y][z] == 2)
-                        grid3D[x][y][z] = 0;
+                        player_old_positions.add(new Vertex3D(x, y, z));
                 }
             }
         }
@@ -1105,9 +1104,17 @@ class Map{
                 }
             }
         }
+        // create the player in new location
         for (Vertex3D p_position: player_positions_3D){
             grid3D[(int)p_position.x][(int)p_position.y][(int)p_position.z] = 2;
         }
+        // if and only if player's position has altered clear the previous position of the player.
+        if(player_positions_3D.size() > 0) {
+            for( Vertex3D player: player_old_positions){
+                grid3D[(int)player.x][(int)player.y][(int)player.z] = 0;
+            }
+        }
+
         update_object_group();
     }
 

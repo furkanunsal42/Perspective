@@ -2,6 +2,7 @@
 Percpective is a puzzle platform game made using native java and javafx without using any library or game engine.
 
 To play the game you can download the executable jar build (454MB) from this adress: https://drive.google.com/drive/folders/1HlYqaHBRlBslcvcaQN-OkEyYjVoQAsiO?usp=sharing
+
 Excecute PLAY.bat file to play
 or run the jar file with "java --module-path "javafx-sdk-17.0.1\lib" --add-modules javafx.controls,javafx.fxml,javafx.media -jar Perspective.jar" command
 please keep in mind that you have to hava java 17 or newer version of java installed on your system.

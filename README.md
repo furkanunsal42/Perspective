@@ -11,7 +11,7 @@ from this adress: https://drive.google.com/drive/folders/1HlYqaHBRlBslcvcaQN-OkE
 Excecute PLAY.bat file to play
 or run the jar file with "java --module-path "javafx-sdk-17.0.1\lib" --add-modules javafx.controls,javafx.fxml,javafx.media -jar Perspective.jar" command
 
-please keep in mind that you have to hava java 17 or newer version of java installed on your system.
+please keep in mind that you have to have java 17 or newer version of java installed on your system.
 
 
 ![Untitled0](https://user-images.githubusercontent.com/89701935/171731886-0616f0c3-3ac0-4609-9e57-d3436cd94d66.png)
